@@ -1,0 +1,24 @@
+{
+  "$schema": "../node_modules/@tauri-apps/cli/config.schema.json",
+  "productName": "0x0-Gen",
+  "version": "0.1.0",
+  "identifier": "dev.oxogen.desktop",
+  "build": {
+    "devUrl": "http://localhost:5173",
+    "frontendDist": "../hub/dist"
+  },
+  "app": {
+    "windows": [
+      {
+        "title": "0x0-Gen Desktop",
+        "width": 1280,
+        "height": 800,
+        "resizable": true
+      }
+    ]
+  },
+  "bundle": {
+    "active": false,
+    "targets": "all"
+  }
+}

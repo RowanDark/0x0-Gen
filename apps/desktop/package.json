@@ -1,0 +1,13 @@
+{
+  "name": "@0x0-gen/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "tauri:dev": "tauri dev",
+    "build": "tauri build",
+    "test": "echo \"No desktop tests\""
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.2.5"
+  }
+}

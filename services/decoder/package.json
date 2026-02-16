@@ -1,0 +1,14 @@
+{
+  "name": "@0x0-gen/decoder",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "test": "echo \"No tests for decoder yet\""
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}

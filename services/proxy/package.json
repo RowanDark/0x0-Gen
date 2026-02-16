@@ -1,0 +1,14 @@
+{
+  "name": "@0x0-gen/proxy",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "test": "echo \"No tests for proxy yet\""
+  },
+  "devDependencies": {
+    "tsx": "^4.19.2"
+  }
+}

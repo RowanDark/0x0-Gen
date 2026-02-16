@@ -1,0 +1,11 @@
+{
+  "name": "@0x0-gen/config",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "files": ["eslint.base.cjs", "prettier.base.json", "tsconfig.base.json"],
+  "scripts": {
+    "build": "echo \"No build required\"",
+    "test": "echo \"No tests for config\""
+  }
+}
