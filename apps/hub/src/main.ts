@@ -16,13 +16,13 @@ app.innerHTML = `
     <p><strong>Gateway URL:</strong> ${gatewayUrl}</p>
     <p><strong>Health status:</strong> <span id="health-status">checking...</span></p>
     <p><strong>WebSocket status:</strong> <span id="ws-status">connecting...</span></p>
-    <p><strong>Last event:</strong> <code id="last-event">none</code></p>
+    <p><strong>Last event:</strong> <span id="last-event">none</span></p>
   </main>
 `;
 
 const healthStatus = document.querySelector<HTMLSpanElement>('#health-status');
 const wsStatus = document.querySelector<HTMLSpanElement>('#ws-status');
-const lastEvent = document.querySelector<HTMLElement>('#last-event');
+const lastEvent = document.querySelector<HTMLSpanElement>('#last-event');
 
 const updateText = (el: HTMLElement | null, text: string) => {
   if (el) {
