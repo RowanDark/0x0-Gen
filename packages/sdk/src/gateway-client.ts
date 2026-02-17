@@ -101,6 +101,41 @@ export class GatewayClient {
     return data.events;
   }
 
+  async generateAttachToken(): Promise<{ token: string; expires: number }> {
+    const res = await fetch(`${this.baseUrl}/hub/token`, { method: "POST" });
+    if (!res.ok) {
+      throw new Error(`Failed to generate attach token: ${res.status}`);
+    }
+    return res.json() as Promise<{ token: string; expires: number }>;
+  }
+
+  async attachToHub(token: string, name: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/hub/attach?token=${token}&name=${encodeURIComponent(name)}`);
+    if (!res.ok) {
+      throw new Error(`Failed to attach to hub: ${res.status}`);
+    }
+  }
+
+  async getConnectedTools(): Promise<{ name: string; status: string; attachedAt: string }[]> {
+    const res = await fetch(`${this.baseUrl}/hub/tools`);
+    if (!res.ok) {
+      throw new Error(`Failed to get connected tools: ${res.status}`);
+    }
+    const data = (await res.json()) as {
+      tools: { name: string; status: string; attachedAt: string }[];
+    };
+    return data.tools;
+  }
+
+  async detachTool(name: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/hub/tools/${encodeURIComponent(name)}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to detach tool: ${res.status}`);
+    }
+  }
+
   connectWebSocket(): void {
     const wsUrl = this.baseUrl.replace(/^http/, "ws") + "/ws";
     logger.info(`Connecting to WebSocket: ${wsUrl}`);
