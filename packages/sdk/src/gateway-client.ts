@@ -1,4 +1,4 @@
-import type { EventMessage } from "@0x0-gen/contracts";
+import type { EventMessage, Project } from "@0x0-gen/contracts";
 import { createLogger } from "@0x0-gen/logger";
 
 const logger = createLogger("sdk:gateway-client");
@@ -30,6 +30,56 @@ export class GatewayClient {
       throw new Error(`Health check failed: ${res.status}`);
     }
     return res.json() as Promise<HealthResponse>;
+  }
+
+  async createProject(name: string): Promise<Project> {
+    const res = await fetch(`${this.baseUrl}/projects`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to create project: ${res.status}`);
+    }
+    return res.json() as Promise<Project>;
+  }
+
+  async listProjects(): Promise<Project[]> {
+    const res = await fetch(`${this.baseUrl}/projects`);
+    if (!res.ok) {
+      throw new Error(`Failed to list projects: ${res.status}`);
+    }
+    const data = (await res.json()) as { projects: Project[] };
+    return data.projects;
+  }
+
+  async getProject(id: string): Promise<Project> {
+    const res = await fetch(`${this.baseUrl}/projects/${id}`);
+    if (!res.ok) {
+      throw new Error(`Failed to get project: ${res.status}`);
+    }
+    return res.json() as Promise<Project>;
+  }
+
+  async updateProject(id: string, data: Partial<Pick<Project, "name">>): Promise<Project> {
+    const res = await fetch(`${this.baseUrl}/projects/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to update project: ${res.status}`);
+    }
+    return res.json() as Promise<Project>;
+  }
+
+  async deleteProject(id: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/projects/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to delete project: ${res.status}`);
+    }
   }
 
   connectWebSocket(): void {
