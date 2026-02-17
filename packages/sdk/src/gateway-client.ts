@@ -1,4 +1,4 @@
-import type { EventMessage, Project } from "@0x0-gen/contracts";
+import type { EventMessage, Project, ProxyConfig, CapturedExchange } from "@0x0-gen/contracts";
 import { createLogger } from "@0x0-gen/logger";
 
 const logger = createLogger("sdk:gateway-client");
@@ -133,6 +133,77 @@ export class GatewayClient {
     });
     if (!res.ok) {
       throw new Error(`Failed to detach tool: ${res.status}`);
+    }
+  }
+
+  async startProxy(
+    config?: Partial<ProxyConfig>,
+  ): Promise<{ port: number; status: string }> {
+    const res = await fetch(`${this.baseUrl}/proxy/start`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(config ?? {}),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to start proxy: ${res.status}`);
+    }
+    return res.json() as Promise<{ port: number; status: string }>;
+  }
+
+  async stopProxy(): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/proxy/stop`, { method: "POST" });
+    if (!res.ok) {
+      throw new Error(`Failed to stop proxy: ${res.status}`);
+    }
+  }
+
+  async getProxyStatus(): Promise<{
+    running: boolean;
+    port: number;
+    captureCount: number;
+  }> {
+    const res = await fetch(`${this.baseUrl}/proxy/status`);
+    if (!res.ok) {
+      throw new Error(`Failed to get proxy status: ${res.status}`);
+    }
+    return res.json() as Promise<{ running: boolean; port: number; captureCount: number }>;
+  }
+
+  async getProxyHistory(options?: {
+    projectId?: string;
+    limit?: number;
+    offset?: number;
+  }): Promise<CapturedExchange[]> {
+    const params = new URLSearchParams();
+    if (options?.projectId) params.set("projectId", options.projectId);
+    if (options?.limit) params.set("limit", String(options.limit));
+    if (options?.offset) params.set("offset", String(options.offset));
+
+    const url = `${this.baseUrl}/proxy/history${params.toString() ? `?${params}` : ""}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to get proxy history: ${res.status}`);
+    }
+    const data = (await res.json()) as { exchanges: CapturedExchange[] };
+    return data.exchanges;
+  }
+
+  async getExchange(id: string): Promise<CapturedExchange> {
+    const res = await fetch(`${this.baseUrl}/proxy/history/${id}`);
+    if (!res.ok) {
+      throw new Error(`Failed to get exchange: ${res.status}`);
+    }
+    return res.json() as Promise<CapturedExchange>;
+  }
+
+  async clearProxyHistory(projectId?: string): Promise<void> {
+    const params = new URLSearchParams();
+    if (projectId) params.set("projectId", projectId);
+
+    const url = `${this.baseUrl}/proxy/history${params.toString() ? `?${params}` : ""}`;
+    const res = await fetch(url, { method: "DELETE" });
+    if (!res.ok) {
+      throw new Error(`Failed to clear proxy history: ${res.status}`);
     }
   }
 
