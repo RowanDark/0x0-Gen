@@ -5,6 +5,7 @@ import { createLogger } from "@0x0-gen/logger";
 import { healthRoutes } from "./routes/health.js";
 import { wsRoutes } from "./routes/ws.js";
 import { serviceRoutes } from "./routes/services.js";
+import { projectRoutes } from "./routes/projects.js";
 
 const logger = createLogger("gateway");
 
@@ -17,6 +18,7 @@ export async function buildApp() {
   await app.register(healthRoutes);
   await app.register(wsRoutes);
   await app.register(serviceRoutes);
+  await app.register(projectRoutes);
 
   logger.info("Gateway app built");
 

@@ -16,10 +16,12 @@
     "@0x0-gen/logger": "workspace:*",
     "@fastify/cors": "^10.0.0",
     "@fastify/websocket": "^11.0.0",
+    "better-sqlite3": "^12.6.2",
     "fastify": "^5.1.0"
   },
   "devDependencies": {
     "@0x0-gen/config": "workspace:*",
+    "@types/better-sqlite3": "^7.6.13",
     "@types/node": "^22.0.0",
     "@types/ws": "^8.5.0",
     "tsx": "^4.19.0",
