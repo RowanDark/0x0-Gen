@@ -14,6 +14,7 @@ export const EventMessageSchema = z.object({
   type: EventTypeSchema,
   source: z.string(),
   payload: z.unknown(),
+  projectId: z.string().uuid().optional(),
   timestamp: z.string().datetime(),
 });
 
