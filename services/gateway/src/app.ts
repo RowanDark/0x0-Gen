@@ -8,6 +8,7 @@ import { serviceRoutes } from "./routes/services.js";
 import { projectRoutes } from "./routes/projects.js";
 import { eventRoutes } from "./routes/events.js";
 import { attachRoutes } from "./routes/attach.js";
+import { proxyRoutes } from "./routes/proxy.js";
 
 const logger = createLogger("gateway");
 
@@ -23,6 +24,7 @@ export async function buildApp() {
   await app.register(projectRoutes);
   await app.register(eventRoutes);
   await app.register(attachRoutes);
+  await app.register(proxyRoutes);
 
   logger.info("Gateway app built");
 

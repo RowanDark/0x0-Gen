@@ -52,6 +52,32 @@ function initSchema(database: Database.Database): void {
 
     CREATE INDEX IF NOT EXISTS idx_events_project_id ON events(project_id);
     CREATE INDEX IF NOT EXISTS idx_events_timestamp ON events(timestamp);
+
+    CREATE TABLE IF NOT EXISTS captures (
+      id TEXT PRIMARY KEY,
+      project_id TEXT,
+      tags TEXT NOT NULL DEFAULT '[]',
+      req_id TEXT NOT NULL,
+      req_timestamp INTEGER NOT NULL,
+      req_method TEXT NOT NULL,
+      req_url TEXT NOT NULL,
+      req_host TEXT NOT NULL,
+      req_path TEXT NOT NULL,
+      req_headers TEXT NOT NULL,
+      req_body TEXT,
+      req_content_length INTEGER NOT NULL,
+      res_id TEXT,
+      res_timestamp INTEGER,
+      res_status_code INTEGER,
+      res_status_message TEXT,
+      res_headers TEXT,
+      res_body TEXT,
+      res_content_length INTEGER,
+      res_duration INTEGER
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_captures_project_id ON captures(project_id);
+    CREATE INDEX IF NOT EXISTS idx_captures_req_timestamp ON captures(req_timestamp);
   `);
 
   logger.info("Database schema initialized");

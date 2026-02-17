@@ -13,3 +13,13 @@ export {
   type EventMessage,
   type EventType,
 } from "./schemas/event.js";
+export {
+  ProxyConfigSchema,
+  ProxyRequestSchema,
+  ProxyResponseSchema,
+  CapturedExchangeSchema,
+  type ProxyConfig,
+  type ProxyRequest,
+  type ProxyResponse,
+  type CapturedExchange,
+} from "./schemas/proxy.js";
