@@ -82,6 +82,25 @@ export class GatewayClient {
     }
   }
 
+  async listEvents(options?: {
+    projectId?: string;
+    limit?: number;
+    type?: string;
+  }): Promise<EventMessage[]> {
+    const params = new URLSearchParams();
+    if (options?.projectId) params.set("projectId", options.projectId);
+    if (options?.limit) params.set("limit", String(options.limit));
+    if (options?.type) params.set("type", options.type);
+
+    const url = `${this.baseUrl}/events${params.toString() ? `?${params}` : ""}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to list events: ${res.status}`);
+    }
+    const data = (await res.json()) as { events: EventMessage[] };
+    return data.events;
+  }
+
   connectWebSocket(): void {
     const wsUrl = this.baseUrl.replace(/^http/, "ws") + "/ws";
     logger.info(`Connecting to WebSocket: ${wsUrl}`);
