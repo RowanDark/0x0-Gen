@@ -7,6 +7,8 @@ export const EventTypeSchema = z.enum([
   "capture:created",
   "capture:updated",
   "health:status",
+  "proxy:request",
+  "proxy:response",
 ]);
 
 export const EventMessageSchema = z.object({
