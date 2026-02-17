@@ -13,6 +13,7 @@ export default defineConfig({
       },
       "/services": "http://localhost:3100",
       "/projects": "http://localhost:3100",
+      "/events": "http://localhost:3100",
     },
   },
 });

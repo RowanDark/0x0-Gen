@@ -1,9 +1,12 @@
 import React, { useEffect, useState } from "react";
 import { GatewayClient } from "@0x0-gen/sdk";
 import type { ConnectionState } from "@0x0-gen/ui";
+import { NotificationToast } from "@0x0-gen/ui";
 import { ProjectProvider } from "./hooks/use-project.js";
+import { useEvents } from "./hooks/use-events.js";
 import { Header } from "./components/header.js";
 import { Sidebar } from "./components/sidebar.js";
+import { EventPanel } from "./components/event-panel.js";
 import { ProjectsView } from "./pages/projects-view.js";
 import { ToolsView } from "./pages/tools-view.js";
 import { SettingsView } from "./pages/settings-view.js";
@@ -18,6 +21,8 @@ function AppContent() {
   const [connectionState, setConnectionState] = useState<ConnectionState>("connecting");
   const [uptime, setUptime] = useState<number | null>(null);
   const [activeView, setActiveView] = useState<View>("projects");
+  const [eventPanelOpen, setEventPanelOpen] = useState(false);
+  const { events, toasts, dismissToast, handleFilterChange } = useEvents();
 
   useEffect(() => {
     let cancelled = false;
@@ -52,15 +57,19 @@ function AppContent() {
 
     gateway.connectWebSocket();
 
-    gateway.onEvent((event) => {
-      // eslint-disable-next-line no-console
-      console.log("[hub] event:", event.type, event);
-    });
-
     return () => {
       gateway.disconnect();
     };
   }, [connectionState]);
+
+  const eventTypes = [
+    "gateway:ready",
+    "service:connected",
+    "service:disconnected",
+    "capture:created",
+    "capture:updated",
+    "health:status",
+  ];
 
   return (
     <div
@@ -75,12 +84,22 @@ function AppContent() {
       <Header connectionState={connectionState} uptime={uptime} />
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
         <Sidebar activeView={activeView} onViewChange={setActiveView} />
-        <main style={{ flex: 1, overflow: "auto" }}>
-          {activeView === "projects" && <ProjectsView />}
-          {activeView === "tools" && <ToolsView />}
-          {activeView === "settings" && <SettingsView />}
-        </main>
+        <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+          <main style={{ flex: 1, overflow: "auto" }}>
+            {activeView === "projects" && <ProjectsView />}
+            {activeView === "tools" && <ToolsView />}
+            {activeView === "settings" && <SettingsView />}
+          </main>
+          <EventPanel
+            events={events}
+            eventTypes={eventTypes}
+            isOpen={eventPanelOpen}
+            onToggle={() => setEventPanelOpen(!eventPanelOpen)}
+            onFilterChange={handleFilterChange}
+          />
+        </div>
       </div>
+      <NotificationToast toasts={toasts} onDismiss={dismissToast} />
     </div>
   );
 }
