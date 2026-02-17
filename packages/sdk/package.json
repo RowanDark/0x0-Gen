@@ -1,0 +1,26 @@
+{
+  "name": "@0x0-gen/sdk",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc --project tsconfig.json",
+    "lint": "eslint src/"
+  },
+  "dependencies": {
+    "@0x0-gen/contracts": "workspace:*",
+    "@0x0-gen/logger": "workspace:*"
+  },
+  "devDependencies": {
+    "@0x0-gen/config": "workspace:*",
+    "typescript": "^5.6.0"
+  }
+}

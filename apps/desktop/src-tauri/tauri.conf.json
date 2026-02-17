@@ -1,0 +1,32 @@
+{
+  "$schema": "https://raw.githubusercontent.com/nicovlad16/tauri-schema/master/tauri.conf.schema.json",
+  "productName": "0x0-Gen",
+  "version": "0.0.0",
+  "identifier": "com.0x0gen.desktop",
+  "build": {
+    "frontendDist": "../dist",
+    "devUrl": "http://localhost:1420",
+    "beforeDevCommand": "pnpm dev",
+    "beforeBuildCommand": "pnpm build"
+  },
+  "app": {
+    "title": "0x0-Gen",
+    "windows": [
+      {
+        "title": "0x0-Gen",
+        "width": 1200,
+        "height": 800,
+        "resizable": true,
+        "fullscreen": false
+      }
+    ],
+    "security": {
+      "csp": null
+    }
+  },
+  "bundle": {
+    "active": true,
+    "targets": "all",
+    "icon": []
+  }
+}

@@ -1,0 +1,14 @@
+{
+  "extends": "./packages/config/tsconfig.base.json",
+  "compilerOptions": {
+    "baseUrl": "."
+  },
+  "references": [
+    { "path": "packages/contracts" },
+    { "path": "packages/logger" },
+    { "path": "packages/sdk" },
+    { "path": "packages/ui" },
+    { "path": "services/gateway" }
+  ],
+  "exclude": ["node_modules", "dist"]
+}
