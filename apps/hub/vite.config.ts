@@ -12,6 +12,9 @@ export default defineConfig({
         ws: true,
       },
       "/services": "http://localhost:3100",
+      "/projects": "http://localhost:3100",
+      "/events": "http://localhost:3100",
+      "/hub": "http://localhost:3100",
     },
   },
 });
