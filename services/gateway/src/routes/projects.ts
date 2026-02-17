@@ -1,5 +1,4 @@
 import type { FastifyInstance } from "fastify";
-import { ProjectSchema } from "@0x0-gen/contracts";
 import { createLogger } from "@0x0-gen/logger";
 import * as projectDb from "../db/projects.js";
 
