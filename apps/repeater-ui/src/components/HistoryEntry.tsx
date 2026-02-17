@@ -27,11 +27,6 @@ function methodColor(method: string): string {
   }
 }
 
-function formatTime(ts: number): string {
-  const d = new Date(ts);
-  return d.toLocaleTimeString("en-US", { hour12: false });
-}
-
 function truncateUrl(url: string, max = 40): string {
   try {
     const u = new URL(url);

@@ -46,7 +46,6 @@ function rowsToHeaders(rows: Header[]): Record<string, string> {
 
 export function HeadersEditor({ headers, onChange }: HeadersEditorProps) {
   const [rows, setRows] = useState<Header[]>(() => headersToRows(headers));
-  const [autocomplete, setAutocomplete] = useState<string[]>([]);
 
   const update = (updated: Header[]) => {
     setRows(updated);
@@ -68,10 +67,6 @@ export function HeadersEditor({ headers, onChange }: HeadersEditorProps) {
 
   const setName = (id: string, name: string) => {
     update(rows.map((r) => (r.id === id ? { ...r, name } : r)));
-    const suggestions = COMMON_HEADERS.filter((h) =>
-      h.toLowerCase().startsWith(name.toLowerCase()),
-    );
-    setAutocomplete(name ? suggestions : []);
   };
 
   const setValue = (id: string, value: string) => {

@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState } from "react";
 import type { RepeaterRequest } from "@0x0-gen/sdk";
 import { HeadersEditor } from "./HeadersEditor.js";
 import { BodyEditor } from "./BodyEditor.js";
@@ -66,12 +66,6 @@ export function RequestEditor({ request, onChange, onParseRaw, onSerialize }: Re
     } else {
       setParseError("Failed to parse raw HTTP");
     }
-  };
-
-  const labelStyle: React.CSSProperties = {
-    color: "#666",
-    fontSize: "11px",
-    marginBottom: 2,
   };
 
   const tabStyle = (active: boolean): React.CSSProperties => ({

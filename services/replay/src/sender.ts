@@ -89,7 +89,7 @@ async function doSend(
   const bodyBuffer =
     request.body !== null ? Buffer.from(request.body, "utf-8") : null;
 
-  const reqOptions: http.RequestOptions = {
+  const reqOptions: https.RequestOptions = {
     method: request.method,
     hostname: url.hostname,
     port: url.port || (isHttps ? 443 : 80),
