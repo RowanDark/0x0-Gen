@@ -46,7 +46,10 @@ describe("FilterBar", () => {
 });
 
 describe("applyFilters", () => {
-  const exchanges = [
+  const exchanges: {
+    request: { method: string; host: string; path: string; headers: Record<string, string>; body: string | null };
+    response: { statusCode: number } | null;
+  }[] = [
     {
       request: {
         method: "GET",

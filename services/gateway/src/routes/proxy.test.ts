@@ -2,6 +2,7 @@ import { describe, it, expect, beforeEach, afterEach, afterAll } from "vitest";
 import { buildApp } from "../app.js";
 import { closeDb, resetDb } from "../db/index.js";
 import { resetProxyState } from "./proxy.js";
+import { resetCACache } from "@0x0-gen/proxy";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
@@ -25,6 +26,7 @@ function createTargetServer(
 
 beforeEach(async () => {
   await resetProxyState();
+  resetCACache();
   closeDb();
   resetDb();
   tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "0x0gen-test-"));
@@ -307,6 +309,100 @@ describe("Gateway /proxy", () => {
       expect(singleRes.json().id).toBe(exchange.id);
 
       targetServer.close();
+    });
+  });
+
+  describe("CA management routes", () => {
+    describe("GET /proxy/ca/status", () => {
+      it("returns not generated status initially", async () => {
+        const response = await app.inject({
+          method: "GET",
+          url: "/proxy/ca/status",
+        });
+
+        expect(response.statusCode).toBe(200);
+        const body = response.json();
+        expect(body.generated).toBe(false);
+        expect(body.fingerprint).toBe("");
+      });
+    });
+
+    describe("GET /proxy/ca/cert", () => {
+      it("generates and returns CA certificate", async () => {
+        const response = await app.inject({
+          method: "GET",
+          url: "/proxy/ca/cert",
+        });
+
+        expect(response.statusCode).toBe(200);
+        expect(response.headers["content-type"]).toContain("application/x-pem-file");
+        expect(response.body).toContain("-----BEGIN CERTIFICATE-----");
+        expect(response.body).toContain("-----END CERTIFICATE-----");
+      });
+    });
+
+    describe("POST /proxy/ca/generate", () => {
+      it("generates a new CA certificate", async () => {
+        const response = await app.inject({
+          method: "POST",
+          url: "/proxy/ca/generate",
+        });
+
+        expect(response.statusCode).toBe(201);
+        const body = response.json();
+        expect(body.generated).toBe(true);
+        expect(body.fingerprint).toBeTruthy();
+      });
+
+      it("regenerating creates a different CA", async () => {
+        const first = await app.inject({
+          method: "POST",
+          url: "/proxy/ca/generate",
+        });
+        const firstFingerprint = first.json().fingerprint;
+
+        resetCACache();
+
+        const second = await app.inject({
+          method: "POST",
+          url: "/proxy/ca/generate",
+        });
+        const secondFingerprint = second.json().fingerprint;
+
+        expect(firstFingerprint).not.toBe(secondFingerprint);
+      });
+    });
+
+    describe("MITM config in proxy start", () => {
+      it("starts proxy with MITM enabled", async () => {
+        const response = await app.inject({
+          method: "POST",
+          url: "/proxy/start",
+          payload: {
+            port: 0,
+            mitmEnabled: true,
+            mitmHosts: ["example.com"],
+          },
+        });
+
+        expect(response.statusCode).toBe(201);
+        expect(response.json().status).toBe("running");
+      });
+
+      it("status reflects mitmEnabled", async () => {
+        await app.inject({
+          method: "POST",
+          url: "/proxy/start",
+          payload: { port: 0, mitmEnabled: true },
+        });
+
+        const status = await app.inject({
+          method: "GET",
+          url: "/proxy/status",
+        });
+
+        expect(status.json().mitmEnabled).toBe(true);
+      });
     });
   });
 });

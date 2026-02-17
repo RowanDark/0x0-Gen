@@ -31,7 +31,7 @@ export function useProxy() {
   }, [pollStatus]);
 
   const startProxy = useCallback(
-    async (config?: { port?: number }) => {
+    async (config?: { port?: number; mitmEnabled?: boolean; mitmHosts?: string[] }) => {
       setLoading(true);
       setError(null);
       try {

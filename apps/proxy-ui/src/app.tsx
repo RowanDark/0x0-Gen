@@ -3,14 +3,18 @@ import type { CapturedExchange } from "@0x0-gen/sdk";
 import { useProxy } from "./hooks/useProxy.js";
 import { useHistory } from "./hooks/useHistory.js";
 import { ProxyControls } from "./components/ProxyControls.js";
+import { MitmControls } from "./components/MitmControls.js";
 import { FilterBar, applyFilters, type FilterState } from "./components/FilterBar.js";
 import { HistoryTable } from "./components/HistoryTable.js";
 import { ExchangeDetail } from "./components/ExchangeDetail.js";
 
 export function App() {
-  const { running, port, captureCount, loading, error, startProxy, stopProxy } = useProxy();
+  const { running, port, captureCount, loading, error, startProxy, stopProxy, gateway } =
+    useProxy();
   const { exchanges, clearHistory } = useHistory();
   const [selectedExchange, setSelectedExchange] = useState<CapturedExchange | null>(null);
+  const [mitmEnabled, setMitmEnabled] = useState(false);
+  const [mitmHosts, setMitmHosts] = useState("");
   const [filters, setFilters] = useState<FilterState>({
     search: "",
     method: null,
@@ -41,7 +45,15 @@ export function App() {
   }, []);
 
   const handleStart = async (config?: { port?: number }) => {
-    await startProxy(config);
+    const hosts = mitmHosts
+      .split(",")
+      .map((h) => h.trim())
+      .filter(Boolean);
+    await startProxy({
+      ...config,
+      mitmEnabled,
+      mitmHosts: hosts,
+    });
   };
 
   const handleStop = async () => {
@@ -73,6 +85,14 @@ export function App() {
         onStart={handleStart}
         onStop={handleStop}
         onClearHistory={handleClearHistory}
+      />
+      <MitmControls
+        mitmEnabled={mitmEnabled}
+        mitmHosts={mitmHosts}
+        running={running}
+        onMitmEnabledChange={setMitmEnabled}
+        onMitmHostsChange={setMitmHosts}
+        gateway={gateway}
       />
       <FilterBar filters={filters} onFilterChange={setFilters} />
       <div style={{ display: "flex", flex: 1, overflow: "hidden" }}>
