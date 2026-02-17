@@ -1,5 +1,4 @@
 {
-  "$schema": "https://raw.githubusercontent.com/nicovlad16/tauri-schema/master/tauri.conf.schema.json",
   "productName": "0x0-Gen",
   "version": "0.0.0",
   "identifier": "com.0x0gen.desktop",
