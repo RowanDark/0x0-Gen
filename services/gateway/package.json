@@ -14,6 +14,7 @@
   "dependencies": {
     "@0x0-gen/contracts": "workspace:*",
     "@0x0-gen/logger": "workspace:*",
+    "@0x0-gen/proxy": "workspace:*",
     "@fastify/cors": "^10.0.0",
     "@fastify/websocket": "^11.0.0",
     "better-sqlite3": "^12.6.2",
