@@ -1,7 +1,14 @@
 import type { FastifyInstance } from "fastify";
 import { randomUUID } from "node:crypto";
 import { createLogger } from "@0x0-gen/logger";
-import { createProxyServer, type ProxyServer } from "@0x0-gen/proxy";
+import {
+  createProxyServer,
+  type ProxyServer,
+  getOrCreateCA,
+  getCAStatus,
+  generateCA,
+  resetCACache,
+} from "@0x0-gen/proxy";
 import type { ProxyConfig, CapturedExchange } from "@0x0-gen/contracts";
 import { ProxyConfigSchema } from "@0x0-gen/contracts";
 import * as captureDb from "../db/captures.js";
@@ -111,6 +118,7 @@ export async function proxyRoutes(app: FastifyInstance) {
       running,
       port: activeConfig?.port ?? 8080,
       captureCount: proxyServer?.getCaptureCount() ?? 0,
+      mitmEnabled: activeConfig?.mitmEnabled ?? false,
     };
   });
 
@@ -150,5 +158,38 @@ export async function proxyRoutes(app: FastifyInstance) {
     const deleted = captureDb.clearCaptures(projectId);
     logger.info(`Cleared ${deleted} captures`);
     return { deleted };
+  });
+
+  // CA management routes
+  app.get("/proxy/ca/status", async () => {
+    return getCAStatus();
+  });
+
+  app.get("/proxy/ca/cert", async (_request, reply) => {
+    try {
+      const ca = getOrCreateCA();
+      return reply
+        .header("Content-Type", "application/x-pem-file")
+        .header("Content-Disposition", 'attachment; filename="0x0-gen-ca.pem"')
+        .send(ca.cert);
+    } catch (err) {
+      logger.error("Failed to get CA certificate", { error: (err as Error).message });
+      return reply.status(500).send({ error: (err as Error).message });
+    }
+  });
+
+  app.post("/proxy/ca/generate", async (_request, reply) => {
+    try {
+      resetCACache();
+      const ca = generateCA();
+      logger.info("CA certificate regenerated");
+      return reply.status(201).send({
+        generated: true,
+        fingerprint: ca.fingerprint,
+      });
+    } catch (err) {
+      logger.error("Failed to generate CA certificate", { error: (err as Error).message });
+      return reply.status(500).send({ error: (err as Error).message });
+    }
   });
 }

@@ -5,6 +5,8 @@ export const ProxyConfigSchema = z.object({
   host: z.string().default("127.0.0.1"),
   projectId: z.string().uuid().optional(),
   interceptEnabled: z.boolean().default(true),
+  mitmEnabled: z.boolean().default(false),
+  mitmHosts: z.array(z.string()).default([]),
 });
 
 export type ProxyConfig = z.infer<typeof ProxyConfigSchema>;

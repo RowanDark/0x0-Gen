@@ -2,7 +2,7 @@ import http from "node:http";
 import { createLogger } from "@0x0-gen/logger";
 import type { ProxyConfig, CapturedExchange, ProxyRequest, ProxyResponse } from "./types.js";
 import { collectBody, captureRequest, captureResponse, buildExchange } from "./interceptor.js";
-import { handleConnect } from "./tunnel.js";
+import { handleConnect, type MitmConfig } from "./tunnel.js";
 
 const logger = createLogger("proxy:server");
 
@@ -165,7 +165,26 @@ export function createProxyServer(
 
         server = http.createServer(handleRequest);
 
-        server.on("connect", handleConnect);
+        const mitmConfig: MitmConfig | undefined =
+          config.mitmEnabled
+            ? {
+                enabled: true,
+                hosts: config.mitmHosts.length > 0 ? config.mitmHosts : undefined,
+                projectId: config.projectId,
+                onRequest: listener.onRequest
+                  ? (req) => {
+                      captureCount++;
+                      listener.onRequest!(req);
+                    }
+                  : undefined,
+                onResponse: listener.onResponse,
+                onExchange: listener.onExchange,
+              }
+            : undefined;
+
+        server.on("connect", (req, socket, head) => {
+          handleConnect(req, socket, head, mitmConfig);
+        });
 
         server.listen(config.port, config.host, () => {
           const addr = server!.address();

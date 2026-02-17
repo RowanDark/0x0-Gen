@@ -207,6 +207,30 @@ export class GatewayClient {
     }
   }
 
+  async getCAStatus(): Promise<{ generated: boolean; fingerprint: string }> {
+    const res = await fetch(`${this.baseUrl}/proxy/ca/status`);
+    if (!res.ok) {
+      throw new Error(`Failed to get CA status: ${res.status}`);
+    }
+    return res.json() as Promise<{ generated: boolean; fingerprint: string }>;
+  }
+
+  async getCACertificate(): Promise<string> {
+    const res = await fetch(`${this.baseUrl}/proxy/ca/cert`);
+    if (!res.ok) {
+      throw new Error(`Failed to get CA certificate: ${res.status}`);
+    }
+    return res.text();
+  }
+
+  async regenerateCA(): Promise<{ generated: boolean; fingerprint: string }> {
+    const res = await fetch(`${this.baseUrl}/proxy/ca/generate`, { method: "POST" });
+    if (!res.ok) {
+      throw new Error(`Failed to regenerate CA: ${res.status}`);
+    }
+    return res.json() as Promise<{ generated: boolean; fingerprint: string }>;
+  }
+
   connectWebSocket(): void {
     const wsUrl = this.baseUrl.replace(/^http/, "ws") + "/ws";
     logger.info(`Connecting to WebSocket: ${wsUrl}`);

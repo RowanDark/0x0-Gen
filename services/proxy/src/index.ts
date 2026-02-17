@@ -8,7 +8,15 @@ export {
   type RequestHandler,
   type ResponseHandler,
 } from "./interceptor.js";
-export { handleConnect } from "./tunnel.js";
+export { handleConnect, type MitmConfig } from "./tunnel.js";
+export {
+  generateCA,
+  loadCA,
+  getOrCreateCA,
+  getCAStatus,
+  resetCACache,
+} from "./ca.js";
+export { generateHostCert, clearCertCache, getCertCacheSize } from "./certs.js";
 export type {
   ProxyConfig,
   ProxyRequest,
