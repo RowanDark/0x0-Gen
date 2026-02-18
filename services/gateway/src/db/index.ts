@@ -125,6 +125,52 @@ function initSchema(database: Database.Database): void {
     );
 
     CREATE INDEX IF NOT EXISTS idx_decoder_presets_project_id ON decoder_presets(project_id);
+
+    CREATE TABLE IF NOT EXISTS intruder_configs (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      project_id TEXT,
+      base_request TEXT NOT NULL,
+      positions TEXT NOT NULL,
+      payload_sets TEXT NOT NULL,
+      attack_type TEXT NOT NULL,
+      options TEXT NOT NULL,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_intruder_configs_project_id ON intruder_configs(project_id);
+
+    CREATE TABLE IF NOT EXISTS intruder_attacks (
+      id TEXT PRIMARY KEY,
+      config_id TEXT NOT NULL,
+      status TEXT NOT NULL,
+      total_requests INTEGER NOT NULL,
+      completed_requests INTEGER NOT NULL DEFAULT 0,
+      started_at INTEGER,
+      completed_at INTEGER
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_intruder_attacks_config_id ON intruder_attacks(config_id);
+
+    CREATE TABLE IF NOT EXISTS intruder_results (
+      id TEXT PRIMARY KEY,
+      attack_id TEXT NOT NULL,
+      request_index INTEGER NOT NULL,
+      payloads TEXT NOT NULL,
+      request TEXT NOT NULL,
+      response_status INTEGER,
+      response_status_message TEXT,
+      response_headers TEXT,
+      response_body TEXT,
+      response_length INTEGER,
+      duration INTEGER NOT NULL,
+      error TEXT,
+      timestamp INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_intruder_results_attack_id ON intruder_results(attack_id);
+    CREATE INDEX IF NOT EXISTS idx_intruder_results_timestamp ON intruder_results(timestamp);
   `);
 
   logger.info("Database schema initialized");

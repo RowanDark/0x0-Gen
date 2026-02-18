@@ -1,5 +1,17 @@
-import { createLogger } from "@0x0-gen/logger";
-
-const logger = createLogger("intruder");
-
-logger.info("Intruder service is a stub — not implemented in Milestone 0");
+export { parsePositions, stripMarkers, getPositionValue } from "./positions.js";
+export { createIterator, calculateTotalRequests } from "./payloads.js";
+export type { PayloadCombination } from "./payloads.js";
+export { renderRequest } from "./renderer.js";
+export { IntruderEngine } from "./engine.js";
+export type {
+  AttackType,
+  PayloadSource,
+  AttackStatus,
+  IntruderPosition,
+  IntruderPayloadSet,
+  IntruderOptions,
+  IntruderConfig,
+  IntruderResponse,
+  IntruderResult,
+  IntruderAttack,
+} from "./types.js";

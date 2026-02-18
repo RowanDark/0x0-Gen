@@ -5,3 +5,6 @@ dist/
 .env
 .env.local
 target/
+*.db
+*.db-shm
+*.db-wal

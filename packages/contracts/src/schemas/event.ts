@@ -13,6 +13,14 @@ export const EventTypeSchema = z.enum([
   "repeater:response",
   "repeater:error",
   "decoder:transform",
+  "intruder:started",
+  "intruder:progress",
+  "intruder:result",
+  "intruder:paused",
+  "intruder:resumed",
+  "intruder:completed",
+  "intruder:cancelled",
+  "intruder:error",
 ]);
 
 export const EventMessageSchema = z.object({

@@ -11,6 +11,10 @@ import type {
   TransformDirection,
   TransformResult,
   DecoderPreset,
+  IntruderConfig,
+  IntruderAttack,
+  IntruderResult,
+  IntruderPosition,
 } from "@0x0-gen/contracts";
 import { createLogger } from "@0x0-gen/logger";
 
@@ -490,6 +494,149 @@ export class GatewayClient {
       throw new Error(`Failed to run preset: ${res.status}`);
     }
     return res.json() as Promise<TransformResult>;
+  }
+
+  // Intruder config methods
+
+  async createIntruderConfig(
+    config: Partial<IntruderConfig>,
+  ): Promise<IntruderConfig> {
+    const res = await fetch(`${this.baseUrl}/intruder/configs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(config),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to create intruder config: ${res.status}`);
+    }
+    return res.json() as Promise<IntruderConfig>;
+  }
+
+  async listIntruderConfigs(projectId?: string): Promise<IntruderConfig[]> {
+    const params = new URLSearchParams();
+    if (projectId) params.set("projectId", projectId);
+    const url = `${this.baseUrl}/intruder/configs${params.toString() ? `?${params}` : ""}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to list intruder configs: ${res.status}`);
+    }
+    const data = (await res.json()) as { configs: IntruderConfig[] };
+    return data.configs;
+  }
+
+  async getIntruderConfig(id: string): Promise<IntruderConfig> {
+    const res = await fetch(`${this.baseUrl}/intruder/configs/${id}`);
+    if (!res.ok) {
+      throw new Error(`Failed to get intruder config: ${res.status}`);
+    }
+    return res.json() as Promise<IntruderConfig>;
+  }
+
+  async updateIntruderConfig(
+    id: string,
+    data: Partial<IntruderConfig>,
+  ): Promise<IntruderConfig> {
+    const res = await fetch(`${this.baseUrl}/intruder/configs/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to update intruder config: ${res.status}`);
+    }
+    return res.json() as Promise<IntruderConfig>;
+  }
+
+  async deleteIntruderConfig(id: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/intruder/configs/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to delete intruder config: ${res.status}`);
+    }
+  }
+
+  // Intruder attack methods
+
+  async startAttack(configId: string): Promise<IntruderAttack> {
+    const res = await fetch(
+      `${this.baseUrl}/intruder/configs/${configId}/start`,
+      { method: "POST" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to start attack: ${res.status}`);
+    }
+    return res.json() as Promise<IntruderAttack>;
+  }
+
+  async pauseAttack(attackId: string): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/intruder/attacks/${attackId}/pause`,
+      { method: "POST" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to pause attack: ${res.status}`);
+    }
+  }
+
+  async resumeAttack(attackId: string): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/intruder/attacks/${attackId}/resume`,
+      { method: "POST" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to resume attack: ${res.status}`);
+    }
+  }
+
+  async cancelAttack(attackId: string): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/intruder/attacks/${attackId}/cancel`,
+      { method: "POST" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to cancel attack: ${res.status}`);
+    }
+  }
+
+  async getAttack(attackId: string): Promise<IntruderAttack> {
+    const res = await fetch(`${this.baseUrl}/intruder/attacks/${attackId}`);
+    if (!res.ok) {
+      throw new Error(`Failed to get attack: ${res.status}`);
+    }
+    return res.json() as Promise<IntruderAttack>;
+  }
+
+  async getAttackResults(
+    attackId: string,
+    options?: { limit?: number; offset?: number },
+  ): Promise<IntruderResult[]> {
+    const params = new URLSearchParams();
+    if (options?.limit) params.set("limit", String(options.limit));
+    if (options?.offset) params.set("offset", String(options.offset));
+
+    const url = `${this.baseUrl}/intruder/attacks/${attackId}/results${params.toString() ? `?${params}` : ""}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to get attack results: ${res.status}`);
+    }
+    const data = (await res.json()) as { results: IntruderResult[] };
+    return data.results;
+  }
+
+  // Intruder utility methods
+
+  async parseIntruderPositions(request: string): Promise<IntruderPosition[]> {
+    const res = await fetch(`${this.baseUrl}/intruder/parse-positions`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ request }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to parse positions: ${res.status}`);
+    }
+    const data = (await res.json()) as { positions: IntruderPosition[] };
+    return data.positions;
   }
 
   connectWebSocket(): void {
