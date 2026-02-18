@@ -1,17 +1,30 @@
-import { describe, it, expect, afterAll } from "vitest";
+import { describe, it, expect, beforeEach, afterAll } from "vitest";
 import { buildApp } from "../app.js";
+import { closeDb, resetDb } from "../db/index.js";
+import fs from "node:fs";
+import path from "node:path";
+import os from "node:os";
+
+let app: Awaited<ReturnType<typeof buildApp>>;
+let tmpDir: string;
+
+beforeEach(async () => {
+  closeDb();
+  resetDb();
+  tmpDir = fs.mkdtempSync(path.join(os.tmpdir(), "0x0gen-test-services-"));
+  process.env.DATA_DIR = tmpDir;
+  app = await buildApp();
+  await app.ready();
+});
+
+afterAll(async () => {
+  if (app) await app.close();
+  closeDb();
+  if (tmpDir) fs.rmSync(tmpDir, { recursive: true, force: true });
+});
 
 describe("Gateway /services", () => {
-  let app: Awaited<ReturnType<typeof buildApp>>;
-
-  afterAll(async () => {
-    if (app) await app.close();
-  });
-
   it("returns stub service list", async () => {
-    app = await buildApp();
-    await app.ready();
-
     const response = await app.inject({
       method: "GET",
       url: "/services",

@@ -1,5 +1,12 @@
-import { createLogger } from "@0x0-gen/logger";
-
-const logger = createLogger("decoder");
-
-logger.info("Decoder service is a stub — not implemented in Milestone 0");
+export { executePipeline } from "./pipeline.js";
+export { getTransform, getTransformTypes } from "./transforms.js";
+export type { TransformTypeInfo } from "./transforms.js";
+export { builtinPresets } from "./presets.js";
+export type {
+  TransformType,
+  TransformDirection,
+  TransformStep,
+  TransformStepResult,
+  TransformResult,
+  DecoderPreset,
+} from "./types.js";

@@ -9,6 +9,10 @@ export const EventTypeSchema = z.enum([
   "health:status",
   "proxy:request",
   "proxy:response",
+  "repeater:sent",
+  "repeater:response",
+  "repeater:error",
+  "decoder:transform",
 ]);
 
 export const EventMessageSchema = z.object({

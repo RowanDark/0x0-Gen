@@ -113,6 +113,18 @@ function initSchema(database: Database.Database): void {
 
     CREATE INDEX IF NOT EXISTS idx_repeater_history_tab_id ON repeater_history(tab_id);
     CREATE INDEX IF NOT EXISTS idx_repeater_history_timestamp ON repeater_history(timestamp);
+
+    CREATE TABLE IF NOT EXISTS decoder_presets (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      steps TEXT NOT NULL,
+      project_id TEXT,
+      is_builtin INTEGER NOT NULL DEFAULT 0,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_decoder_presets_project_id ON decoder_presets(project_id);
   `);
 
   logger.info("Database schema initialized");
