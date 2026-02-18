@@ -15,6 +15,7 @@
     "@0x0-gen/contracts": "workspace:*",
     "@0x0-gen/logger": "workspace:*",
     "@0x0-gen/decoder": "workspace:*",
+    "@0x0-gen/intruder": "workspace:*",
     "@0x0-gen/proxy": "workspace:*",
     "@0x0-gen/replay": "workspace:*",
     "@fastify/cors": "^10.0.0",
