@@ -6,6 +6,11 @@ import type {
   RepeaterTab,
   RepeaterRequest,
   RepeaterHistoryEntry,
+  TransformStep,
+  TransformType,
+  TransformDirection,
+  TransformResult,
+  DecoderPreset,
 } from "@0x0-gen/contracts";
 import { createLogger } from "@0x0-gen/logger";
 
@@ -354,6 +359,137 @@ export class GatewayClient {
       throw new Error(`Failed to create tab from capture: ${res.status}`);
     }
     return res.json() as Promise<RepeaterTab>;
+  }
+
+  // Decoder methods
+
+  async transform(
+    input: string,
+    steps: TransformStep[],
+  ): Promise<TransformResult> {
+    const res = await fetch(`${this.baseUrl}/decoder/transform`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input, steps }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to transform: ${res.status}`);
+    }
+    return res.json() as Promise<TransformResult>;
+  }
+
+  async transformSingle(
+    input: string,
+    type: TransformType,
+    direction: TransformDirection,
+    options?: Record<string, unknown>,
+  ): Promise<TransformResult> {
+    const res = await fetch(`${this.baseUrl}/decoder/${type}/${direction}`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input, options }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to transform: ${res.status}`);
+    }
+    return res.json() as Promise<TransformResult>;
+  }
+
+  async listTransformTypes(): Promise<
+    {
+      type: TransformType;
+      name: string;
+      category: string;
+      directions: TransformDirection[];
+      description: string;
+    }[]
+  > {
+    const res = await fetch(`${this.baseUrl}/decoder/types`);
+    if (!res.ok) {
+      throw new Error(`Failed to list transform types: ${res.status}`);
+    }
+    const data = (await res.json()) as {
+      types: {
+        type: TransformType;
+        name: string;
+        category: string;
+        directions: TransformDirection[];
+        description: string;
+      }[];
+    };
+    return data.types;
+  }
+
+  async listPresets(projectId?: string): Promise<DecoderPreset[]> {
+    const params = new URLSearchParams();
+    if (projectId) params.set("projectId", projectId);
+    const url = `${this.baseUrl}/decoder/presets${params.toString() ? `?${params}` : ""}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to list presets: ${res.status}`);
+    }
+    const data = (await res.json()) as { presets: DecoderPreset[] };
+    return data.presets;
+  }
+
+  async getPreset(id: string): Promise<DecoderPreset> {
+    const res = await fetch(`${this.baseUrl}/decoder/presets/${id}`);
+    if (!res.ok) {
+      throw new Error(`Failed to get preset: ${res.status}`);
+    }
+    return res.json() as Promise<DecoderPreset>;
+  }
+
+  async createPreset(
+    name: string,
+    steps: TransformStep[],
+    projectId?: string,
+  ): Promise<DecoderPreset> {
+    const res = await fetch(`${this.baseUrl}/decoder/presets`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ name, steps, projectId }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to create preset: ${res.status}`);
+    }
+    return res.json() as Promise<DecoderPreset>;
+  }
+
+  async updatePreset(
+    id: string,
+    data: { name?: string; steps?: TransformStep[] },
+  ): Promise<DecoderPreset> {
+    const res = await fetch(`${this.baseUrl}/decoder/presets/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to update preset: ${res.status}`);
+    }
+    return res.json() as Promise<DecoderPreset>;
+  }
+
+  async deletePreset(id: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/decoder/presets/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to delete preset: ${res.status}`);
+    }
+  }
+
+  async runPreset(id: string, input: string): Promise<TransformResult> {
+    const res = await fetch(`${this.baseUrl}/decoder/presets/${id}/run`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ input }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to run preset: ${res.status}`);
+    }
+    return res.json() as Promise<TransformResult>;
   }
 
   connectWebSocket(): void {
