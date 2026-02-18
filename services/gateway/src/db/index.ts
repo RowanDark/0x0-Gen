@@ -78,6 +78,41 @@ function initSchema(database: Database.Database): void {
 
     CREATE INDEX IF NOT EXISTS idx_captures_project_id ON captures(project_id);
     CREATE INDEX IF NOT EXISTS idx_captures_req_timestamp ON captures(req_timestamp);
+
+    CREATE TABLE IF NOT EXISTS repeater_tabs (
+      id TEXT PRIMARY KEY,
+      name TEXT NOT NULL,
+      project_id TEXT,
+      request_method TEXT NOT NULL DEFAULT 'GET',
+      request_url TEXT NOT NULL DEFAULT '',
+      request_headers TEXT NOT NULL DEFAULT '{}',
+      request_body TEXT,
+      created_at INTEGER NOT NULL,
+      updated_at INTEGER NOT NULL
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_repeater_tabs_project_id ON repeater_tabs(project_id);
+
+    CREATE TABLE IF NOT EXISTS repeater_history (
+      id TEXT PRIMARY KEY,
+      tab_id TEXT NOT NULL,
+      timestamp INTEGER NOT NULL,
+      request_method TEXT NOT NULL,
+      request_url TEXT NOT NULL,
+      request_headers TEXT NOT NULL,
+      request_body TEXT,
+      response_status_code INTEGER,
+      response_status_message TEXT,
+      response_headers TEXT,
+      response_body TEXT,
+      response_content_length INTEGER,
+      duration INTEGER NOT NULL,
+      error TEXT,
+      FOREIGN KEY (tab_id) REFERENCES repeater_tabs(id) ON DELETE CASCADE
+    );
+
+    CREATE INDEX IF NOT EXISTS idx_repeater_history_tab_id ON repeater_history(tab_id);
+    CREATE INDEX IF NOT EXISTS idx_repeater_history_timestamp ON repeater_history(timestamp);
   `);
 
   logger.info("Database schema initialized");

@@ -1,4 +1,12 @@
-import type { EventMessage, Project, ProxyConfig, CapturedExchange } from "@0x0-gen/contracts";
+import type {
+  EventMessage,
+  Project,
+  ProxyConfig,
+  CapturedExchange,
+  RepeaterTab,
+  RepeaterRequest,
+  RepeaterHistoryEntry,
+} from "@0x0-gen/contracts";
 import { createLogger } from "@0x0-gen/logger";
 
 const logger = createLogger("sdk:gateway-client");
@@ -229,6 +237,123 @@ export class GatewayClient {
       throw new Error(`Failed to regenerate CA: ${res.status}`);
     }
     return res.json() as Promise<{ generated: boolean; fingerprint: string }>;
+  }
+
+  // Repeater tab methods
+
+  async createRepeaterTab(projectId?: string): Promise<RepeaterTab> {
+    const res = await fetch(`${this.baseUrl}/repeater/tabs`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ projectId }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to create repeater tab: ${res.status}`);
+    }
+    return res.json() as Promise<RepeaterTab>;
+  }
+
+  async listRepeaterTabs(projectId?: string): Promise<RepeaterTab[]> {
+    const params = new URLSearchParams();
+    if (projectId) params.set("projectId", projectId);
+    const url = `${this.baseUrl}/repeater/tabs${params.toString() ? `?${params}` : ""}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to list repeater tabs: ${res.status}`);
+    }
+    const data = (await res.json()) as { tabs: RepeaterTab[] };
+    return data.tabs;
+  }
+
+  async getRepeaterTab(id: string): Promise<RepeaterTab> {
+    const res = await fetch(`${this.baseUrl}/repeater/tabs/${id}`);
+    if (!res.ok) {
+      throw new Error(`Failed to get repeater tab: ${res.status}`);
+    }
+    return res.json() as Promise<RepeaterTab>;
+  }
+
+  async updateRepeaterTab(
+    id: string,
+    data: { name?: string; request?: RepeaterRequest },
+  ): Promise<RepeaterTab> {
+    const res = await fetch(`${this.baseUrl}/repeater/tabs/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to update repeater tab: ${res.status}`);
+    }
+    return res.json() as Promise<RepeaterTab>;
+  }
+
+  async deleteRepeaterTab(id: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/repeater/tabs/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to delete repeater tab: ${res.status}`);
+    }
+  }
+
+  // Repeater request methods
+
+  async sendRepeaterRequest(tabId: string): Promise<RepeaterHistoryEntry> {
+    const res = await fetch(`${this.baseUrl}/repeater/tabs/${tabId}/send`, {
+      method: "POST",
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to send repeater request: ${res.status}`);
+    }
+    return res.json() as Promise<RepeaterHistoryEntry>;
+  }
+
+  async clearRepeaterHistory(tabId: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/repeater/tabs/${tabId}/history`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to clear repeater history: ${res.status}`);
+    }
+  }
+
+  // Repeater utility methods
+
+  async parseRawRequest(raw: string): Promise<RepeaterRequest> {
+    const res = await fetch(`${this.baseUrl}/repeater/parse`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ raw }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to parse raw request: ${res.status}`);
+    }
+    return res.json() as Promise<RepeaterRequest>;
+  }
+
+  async serializeRequest(request: RepeaterRequest): Promise<string> {
+    const res = await fetch(`${this.baseUrl}/repeater/serialize`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(request),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to serialize request: ${res.status}`);
+    }
+    const data = (await res.json()) as { raw: string };
+    return data.raw;
+  }
+
+  async createTabFromCapture(captureId: string): Promise<RepeaterTab> {
+    const res = await fetch(
+      `${this.baseUrl}/repeater/tabs/from-capture/${captureId}`,
+      { method: "POST" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to create tab from capture: ${res.status}`);
+    }
+    return res.json() as Promise<RepeaterTab>;
   }
 
   connectWebSocket(): void {

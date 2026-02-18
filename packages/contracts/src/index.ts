@@ -23,3 +23,13 @@ export {
   type ProxyResponse,
   type CapturedExchange,
 } from "./schemas/proxy.js";
+export {
+  RepeaterRequestSchema,
+  RepeaterResponseSchema,
+  RepeaterHistoryEntrySchema,
+  RepeaterTabSchema,
+  type RepeaterRequest,
+  type RepeaterResponse,
+  type RepeaterHistoryEntry,
+  type RepeaterTab,
+} from "./schemas/repeater.js";
