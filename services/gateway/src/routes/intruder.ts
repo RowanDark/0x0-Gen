@@ -4,7 +4,6 @@ import { createLogger } from "@0x0-gen/logger";
 import {
   IntruderEngine,
   parsePositions,
-  calculateTotalRequests,
 } from "@0x0-gen/intruder";
 import type {
   IntruderConfig,
@@ -56,17 +55,6 @@ engine.on("progress", (attack: IntruderAttack) => {
 });
 
 engine.on("result", (result: IntruderResult) => {
-  // Find attack to get the attackId for storage
-  const attack = engine.getStatus(
-    // We need to find the attackId from the result's configId
-    // The result has configId, we need to iterate to find it
-    // Actually, let's use a different approach - store attackId on result events
-    result.configId,
-  );
-
-  // Store result to DB - we need the attackId
-  // The engine emits the result, and we need to find which attack it belongs to
-  // Since we track attacks by configId -> attackId, let's use a lookup
   const attackId = findAttackIdByConfigId(result.configId);
   if (attackId) {
     intruderDb.insertResult(attackId, result);
@@ -322,8 +310,8 @@ export async function intruderRoutes(app: FastifyInstance) {
         const attackId = await engine.start(config);
         activeAttacks.set(config.id, attackId);
 
-        const attack = engine.getStatus(attackId);
         logger.info(`Started attack ${attackId} for config ${config.id}`);
+        const attack = engine.getStatus(attackId);
         return reply.status(201).send(attack);
       } catch (err) {
         const error = err instanceof Error ? err.message : String(err);

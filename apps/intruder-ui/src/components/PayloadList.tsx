@@ -46,7 +46,7 @@ const BUILTIN_LISTS: Record<string, string[]> = {
   ],
 };
 
-export function PayloadList({ payloadSet, index, onUpdate, onRemove }: PayloadListProps) {
+export function PayloadList({ payloadSet, index: _index, onUpdate, onRemove }: PayloadListProps) {
   const [text, setText] = useState(payloadSet.payloads.join("\n"));
   const [urlEncode, setUrlEncode] = useState(false);
   const [prefix, setPrefix] = useState("");

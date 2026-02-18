@@ -79,7 +79,6 @@ function* sniperIterator(config: IntruderConfig): Generator<PayloadCombination> 
   let index = 0;
 
   for (const position of positions) {
-    const posName = position.name ?? position.id;
     for (const payload of payloads) {
       const combination: Record<string, string> = {};
       // Only set the current position's payload; others use empty string

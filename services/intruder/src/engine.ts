@@ -6,7 +6,6 @@ import type {
   IntruderAttack,
   IntruderResult,
   IntruderResponse,
-  AttackStatus,
 } from "./types.js";
 import { createIterator, calculateTotalRequests } from "./payloads.js";
 import { renderRequest } from "./renderer.js";
