@@ -10,6 +10,7 @@ export interface EntityDetailProps {
   onUpdateNotes: (notes: string) => void;
   onDelete: () => void;
   onNavigateEntity: (id: string) => void;
+  onAddToMapper?: (entityId: string) => void;
 }
 
 const categoryColors: Record<string, string> = {
@@ -32,6 +33,7 @@ export function EntityDetail({
   onUpdateNotes,
   onDelete,
   onNavigateEntity,
+  onAddToMapper,
 }: EntityDetailProps) {
   const [notes, setNotes] = useState(entity.notes ?? "");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
@@ -42,6 +44,22 @@ export function EntityDetail({
       onUpdateNotes(notes);
     }
   }, [notes, entity.notes, onUpdateNotes]);
+
+  const handleSendToRepeater = useCallback(() => {
+    if (entity.type !== "url") return;
+    const repeaterUrl = `/repeater?url=${encodeURIComponent(entity.value)}`;
+    window.open(repeaterUrl, "_blank");
+  }, [entity]);
+
+  const handleSendToIntruder = useCallback(() => {
+    if (entity.type !== "url") return;
+    const intruderUrl = `/intruder?url=${encodeURIComponent(entity.value)}`;
+    window.open(intruderUrl, "_blank");
+  }, [entity]);
+
+  const handleAddToMapper = useCallback(() => {
+    onAddToMapper?.(entity.id);
+  }, [entity, onAddToMapper]);
 
   const sectionStyle: React.CSSProperties = {
     marginBottom: 16,
@@ -239,6 +257,26 @@ export function EntityDetail({
           </div>
         </div>
       )}
+
+      {/* Tool Integration Actions */}
+      <div style={{ ...sectionStyle, display: "flex", gap: 6, flexWrap: "wrap" }}>
+        {entity.type === "url" && (
+          <>
+            <button onClick={handleSendToRepeater} style={btnStyle}>
+              Send to Repeater
+            </button>
+            <button onClick={handleSendToIntruder} style={btnStyle}>
+              Send to Intruder
+            </button>
+          </>
+        )}
+        <button
+          onClick={handleAddToMapper}
+          style={{ ...btnStyle, color: "#22c55e", borderColor: "#22c55e44" }}
+        >
+          Add to Mapper
+        </button>
+      </div>
 
       {/* Actions */}
       <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
