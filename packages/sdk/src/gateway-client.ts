@@ -15,6 +15,11 @@ import type {
   IntruderAttack,
   IntruderResult,
   IntruderPosition,
+  ReconProject,
+  ReconEntity,
+  ReconRelationship,
+  ReconImport,
+  ImportSourceType,
 } from "@0x0-gen/contracts";
 import { createLogger } from "@0x0-gen/logger";
 
@@ -686,5 +691,402 @@ export class GatewayClient {
 
   get connected(): boolean {
     return this.ws?.readyState === WebSocket.OPEN;
+  }
+
+  // ========================
+  // Recon — Project methods
+  // ========================
+
+  async createReconProject(data: {
+    name: string;
+    targets?: string[];
+    description?: string;
+  }): Promise<ReconProject> {
+    const res = await fetch(`${this.baseUrl}/recon/projects`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to create recon project: ${res.status}`);
+    }
+    return res.json() as Promise<ReconProject>;
+  }
+
+  async listReconProjects(): Promise<ReconProject[]> {
+    const res = await fetch(`${this.baseUrl}/recon/projects`);
+    if (!res.ok) {
+      throw new Error(`Failed to list recon projects: ${res.status}`);
+    }
+    const data = (await res.json()) as { projects: ReconProject[] };
+    return data.projects;
+  }
+
+  async getReconProject(
+    id: string,
+  ): Promise<ReconProject & { stats: Record<string, unknown> }> {
+    const res = await fetch(`${this.baseUrl}/recon/projects/${id}`);
+    if (!res.ok) {
+      throw new Error(`Failed to get recon project: ${res.status}`);
+    }
+    return res.json() as Promise<ReconProject & { stats: Record<string, unknown> }>;
+  }
+
+  async updateReconProject(
+    id: string,
+    data: Partial<Pick<ReconProject, "name" | "description" | "targets">>,
+  ): Promise<ReconProject> {
+    const res = await fetch(`${this.baseUrl}/recon/projects/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to update recon project: ${res.status}`);
+    }
+    return res.json() as Promise<ReconProject>;
+  }
+
+  async deleteReconProject(id: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/recon/projects/${id}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to delete recon project: ${res.status}`);
+    }
+  }
+
+  // ========================
+  // Recon — Import methods
+  // ========================
+
+  async importReconText(
+    projectId: string,
+    content: string,
+    source?: ImportSourceType,
+    filename?: string,
+  ): Promise<ReconImport> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/import/text`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ content, source, filename }),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to import recon text: ${res.status}`);
+    }
+    return res.json() as Promise<ReconImport>;
+  }
+
+  async listReconImports(projectId: string): Promise<ReconImport[]> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/imports`,
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to list recon imports: ${res.status}`);
+    }
+    const data = (await res.json()) as { imports: ReconImport[] };
+    return data.imports;
+  }
+
+  async getReconImport(
+    projectId: string,
+    importId: string,
+  ): Promise<ReconImport> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/imports/${importId}`,
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to get recon import: ${res.status}`);
+    }
+    return res.json() as Promise<ReconImport>;
+  }
+
+  async deleteReconImport(
+    projectId: string,
+    importId: string,
+  ): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/imports/${importId}`,
+      { method: "DELETE" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to delete recon import: ${res.status}`);
+    }
+  }
+
+  // ========================
+  // Recon — Entity methods
+  // ========================
+
+  async listReconEntities(
+    projectId: string,
+    options?: {
+      category?: string;
+      type?: string;
+      source?: string;
+      tag?: string;
+      search?: string;
+      limit?: number;
+      offset?: number;
+      sort?: string;
+    },
+  ): Promise<{ entities: ReconEntity[]; total: number }> {
+    const params = new URLSearchParams();
+    if (options?.category) params.set("category", options.category);
+    if (options?.type) params.set("type", options.type);
+    if (options?.source) params.set("source", options.source);
+    if (options?.tag) params.set("tag", options.tag);
+    if (options?.search) params.set("search", options.search);
+    if (options?.limit) params.set("limit", String(options.limit));
+    if (options?.offset) params.set("offset", String(options.offset));
+    if (options?.sort) params.set("sort", options.sort);
+
+    const url = `${this.baseUrl}/recon/projects/${projectId}/entities${params.toString() ? `?${params}` : ""}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to list recon entities: ${res.status}`);
+    }
+    return res.json() as Promise<{ entities: ReconEntity[]; total: number }>;
+  }
+
+  async getReconEntity(
+    projectId: string,
+    entityId: string,
+  ): Promise<ReconEntity & { relationships: ReconRelationship[] }> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/entities/${entityId}`,
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to get recon entity: ${res.status}`);
+    }
+    return res.json() as Promise<
+      ReconEntity & { relationships: ReconRelationship[] }
+    >;
+  }
+
+  async updateReconEntity(
+    projectId: string,
+    entityId: string,
+    data: { tags?: string[]; notes?: string },
+  ): Promise<ReconEntity> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/entities/${entityId}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to update recon entity: ${res.status}`);
+    }
+    return res.json() as Promise<ReconEntity>;
+  }
+
+  async deleteReconEntity(
+    projectId: string,
+    entityId: string,
+  ): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/entities/${entityId}`,
+      { method: "DELETE" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to delete recon entity: ${res.status}`);
+    }
+  }
+
+  async bulkTagEntities(
+    projectId: string,
+    entityIds: string[],
+    tag: string,
+  ): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/entities/bulk/tag`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entityIds, tag }),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to bulk tag entities: ${res.status}`);
+    }
+  }
+
+  async bulkDeleteEntities(
+    projectId: string,
+    entityIds: string[],
+  ): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/entities/bulk/delete`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entityIds }),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to bulk delete entities: ${res.status}`);
+    }
+  }
+
+  async exportEntities(
+    projectId: string,
+    entityIds: string[],
+    format: "json" | "csv" = "json",
+  ): Promise<string> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/entities/bulk/export`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entityIds, format }),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to export entities: ${res.status}`);
+    }
+    return res.text();
+  }
+
+  // ========================
+  // Recon — Relationship methods
+  // ========================
+
+  async listReconRelationships(
+    projectId: string,
+    entityId?: string,
+  ): Promise<ReconRelationship[]> {
+    const params = new URLSearchParams();
+    if (entityId) params.set("entityId", entityId);
+
+    const url = `${this.baseUrl}/recon/projects/${projectId}/relationships${params.toString() ? `?${params}` : ""}`;
+    const res = await fetch(url);
+    if (!res.ok) {
+      throw new Error(`Failed to list recon relationships: ${res.status}`);
+    }
+    const data = (await res.json()) as {
+      relationships: ReconRelationship[];
+    };
+    return data.relationships;
+  }
+
+  async createReconRelationship(
+    projectId: string,
+    data: { fromEntityId: string; toEntityId: string; type: string },
+  ): Promise<ReconRelationship> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/relationships`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to create recon relationship: ${res.status}`);
+    }
+    return res.json() as Promise<ReconRelationship>;
+  }
+
+  async deleteReconRelationship(
+    projectId: string,
+    relationshipId: string,
+  ): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/relationships/${relationshipId}`,
+      { method: "DELETE" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to delete recon relationship: ${res.status}`);
+    }
+  }
+
+  // ========================
+  // Recon — Stats methods
+  // ========================
+
+  async getReconStats(
+    projectId: string,
+  ): Promise<Record<string, unknown>> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/stats`,
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to get recon stats: ${res.status}`);
+    }
+    return res.json() as Promise<Record<string, unknown>>;
+  }
+
+  async getReconTimeline(
+    projectId: string,
+  ): Promise<Array<{ date: string; count: number; category: string }>> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/timeline`,
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to get recon timeline: ${res.status}`);
+    }
+    const data = (await res.json()) as {
+      timeline: Array<{ date: string; count: number; category: string }>;
+    };
+    return data.timeline;
+  }
+
+  async getReconGraph(
+    projectId: string,
+  ): Promise<{
+    nodes: Array<{ id: string; label: string; type: string; category: string; confidence: number }>;
+    edges: Array<{ id: string; source: string; target: string; type: string; confidence: number }>;
+  }> {
+    const res = await fetch(
+      `${this.baseUrl}/recon/projects/${projectId}/graph`,
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to get recon graph: ${res.status}`);
+    }
+    return res.json() as Promise<{
+      nodes: Array<{ id: string; label: string; type: string; category: string; confidence: number }>;
+      edges: Array<{ id: string; source: string; target: string; type: string; confidence: number }>;
+    }>;
+  }
+
+  // ========================
+  // Recon — Utility methods
+  // ========================
+
+  async listReconParsers(): Promise<
+    Array<{ name: string; source: string; formats: string[] }>
+  > {
+    const res = await fetch(`${this.baseUrl}/recon/parsers`);
+    if (!res.ok) {
+      throw new Error(`Failed to list recon parsers: ${res.status}`);
+    }
+    const data = (await res.json()) as {
+      parsers: Array<{ name: string; source: string; formats: string[] }>;
+    };
+    return data.parsers;
+  }
+
+  async detectReconFormat(
+    content: string,
+    filename?: string,
+  ): Promise<{ source: string | null; confidence: number }> {
+    const res = await fetch(`${this.baseUrl}/recon/detect`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ content, filename }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to detect recon format: ${res.status}`);
+    }
+    return res.json() as Promise<{
+      source: string | null;
+      confidence: number;
+    }>;
   }
 }
