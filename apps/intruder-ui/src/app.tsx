@@ -1,4 +1,4 @@
-import React, { useState, useCallback, useEffect, useMemo } from "react";
+import React, { useState, useCallback, useEffect, useMemo, useRef } from "react";
 import type { IntruderPayloadSet, IntruderOptions, AttackType } from "@0x0-gen/sdk";
 import { useIntruder } from "./hooks/useIntruder.js";
 import { useConfig } from "./hooks/useConfig.js";
@@ -63,6 +63,27 @@ export function App() {
     () => payloadSets.map((s) => s.payloads.length),
     [payloadSets],
   );
+
+  // Handle URL query parameter (e.g., ?url=https://example.com)
+  const urlParamHandled = useRef(false);
+  useEffect(() => {
+    if (urlParamHandled.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const urlParam = params.get("url");
+    if (!urlParam) return;
+    urlParamHandled.current = true;
+
+    // Clear the URL param to avoid re-creating on refresh
+    window.history.replaceState({}, "", window.location.pathname);
+
+    try {
+      const parsed = new URL(urlParam);
+      const template = `GET ${parsed.pathname}${parsed.search} HTTP/1.1\r\nHost: ${parsed.host}\r\n\r\n`;
+      setBaseRequest(template);
+    } catch {
+      setBaseRequest(`GET / HTTP/1.1\r\nHost: ${urlParam}\r\n\r\n`);
+    }
+  }, []);
 
   const canStart =
     baseRequest.length > 0 &&
