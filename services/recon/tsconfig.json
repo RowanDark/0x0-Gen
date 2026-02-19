@@ -7,11 +7,6 @@
   "include": ["src"],
   "references": [
     { "path": "../../packages/contracts" },
-    { "path": "../../packages/logger" },
-    { "path": "../decoder" },
-    { "path": "../intruder" },
-    { "path": "../proxy" },
-    { "path": "../recon" },
-    { "path": "../replay" }
+    { "path": "../../packages/logger" }
   ]
 }

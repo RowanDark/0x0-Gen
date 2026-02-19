@@ -21,6 +21,11 @@ export const EventTypeSchema = z.enum([
   "intruder:completed",
   "intruder:cancelled",
   "intruder:error",
+  "recon:import:started",
+  "recon:import:progress",
+  "recon:import:completed",
+  "recon:entity:created",
+  "recon:entity:updated",
 ]);
 
 export const EventMessageSchema = z.object({
