@@ -11,6 +11,7 @@
     { "path": "../decoder" },
     { "path": "../intruder" },
     { "path": "../proxy" },
+    { "path": "../recon" },
     { "path": "../replay" }
   ]
 }

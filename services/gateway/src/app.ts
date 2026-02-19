@@ -12,6 +12,8 @@ import { proxyRoutes } from "./routes/proxy.js";
 import { repeaterRoutes } from "./routes/repeater.js";
 import { decoderRoutes } from "./routes/decoder.js";
 import { intruderRoutes } from "./routes/intruder.js";
+import { reconRoutes } from "./routes/recon.js";
+import multipart from "@fastify/multipart";
 
 const logger = createLogger("gateway");
 
@@ -20,6 +22,7 @@ export async function buildApp() {
 
   await app.register(cors, { origin: true });
   await app.register(websocket);
+  await app.register(multipart, { limits: { fileSize: 100 * 1024 * 1024 } });
 
   await app.register(healthRoutes);
   await app.register(wsRoutes);
@@ -31,6 +34,7 @@ export async function buildApp() {
   await app.register(repeaterRoutes);
   await app.register(decoderRoutes);
   await app.register(intruderRoutes);
+  await app.register(reconRoutes);
 
   logger.info("Gateway app built");
 
