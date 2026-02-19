@@ -1,4 +1,4 @@
-export { MapperView, type MapperViewProps } from "./MapperView.js";
+export { MapperView, type MapperViewProps, type EntityToAdd } from "./MapperView.js";
 export { Canvas, type CanvasProps } from "./Canvas.js";
 export { Toolbar, type ToolbarProps } from "./Toolbar.js";
 export { NodeDetail, type NodeDetailProps } from "./NodeDetail.js";

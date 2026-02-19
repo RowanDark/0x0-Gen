@@ -8,13 +8,22 @@ import { Toolbar } from "./Toolbar.js";
 import { NodeDetail } from "./NodeDetail.js";
 import { Legend } from "./Legend.js";
 
+export interface EntityToAdd {
+  id: string;
+  label: string;
+  type: string;
+  category: string;
+  confidence: number;
+}
+
 export interface MapperViewProps {
   projectId: string;
   gateway: GatewayClient;
-  onAddNodeRequest?: (nodeId: string) => void;
+  entityToAdd?: EntityToAdd | null;
+  onEntityAdded?: () => void;
 }
 
-export function MapperView({ projectId, gateway }: MapperViewProps) {
+export function MapperView({ projectId, gateway, entityToAdd, onEntityAdded }: MapperViewProps) {
   const [graphData, setGraphData] = useState<GraphData | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -66,6 +75,19 @@ export function MapperView({ projectId, gateway }: MapperViewProps) {
       cancelled = true;
     };
   }, [projectId, gateway]);
+
+  // Handle external entity additions
+  useEffect(() => {
+    if (!entityToAdd) return;
+    addNode({
+      id: entityToAdd.id,
+      label: entityToAdd.label,
+      type: entityToAdd.type,
+      category: entityToAdd.category,
+      confidence: entityToAdd.confidence,
+    });
+    onEntityAdded?.();
+  }, [entityToAdd, addNode, onEntityAdded]);
 
   // Auto-fit on first load
   useEffect(() => {

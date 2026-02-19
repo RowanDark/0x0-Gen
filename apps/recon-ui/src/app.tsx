@@ -9,6 +9,7 @@ import {
   ProjectContextProvider,
 } from "./hooks/useReconProject.js";
 import { MapperView } from "@0x0-gen/mapper-components";
+import type { EntityToAdd } from "@0x0-gen/mapper-components";
 import { Dashboard } from "./components/Dashboard.js";
 import { EntityBrowser } from "./components/EntityBrowser.js";
 import { ImportModal } from "./components/ImportModal.js";
@@ -30,6 +31,7 @@ function AppContent() {
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [entityFilter, setEntityFilter] = useState<string | undefined>();
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [pendingMapperEntity, setPendingMapperEntity] = useState<EntityToAdd | null>(null);
 
   // Health check
   useEffect(() => {
@@ -111,6 +113,31 @@ function AppContent() {
     addToast("Import completed successfully", "success");
   }, [addToast]);
 
+  const handleAddToMapper = useCallback(
+    async (entityId: string) => {
+      if (!activeProject) return;
+      try {
+        const entity = await gateway.getReconEntity(activeProject.id, entityId);
+        setPendingMapperEntity({
+          id: entity.id,
+          label: entity.value,
+          type: entity.type,
+          category: entity.category,
+          confidence: entity.confidence,
+        });
+        setActiveView("graph");
+        addToast("Entity added to graph", "success");
+      } catch {
+        addToast("Failed to add entity to graph", "error");
+      }
+    },
+    [activeProject, gateway, addToast],
+  );
+
+  const handleEntityAdded = useCallback(() => {
+    setPendingMapperEntity(null);
+  }, []);
+
   const navBtnStyle = (active: boolean): React.CSSProperties => ({
     background: active ? "#1a1a1a" : "transparent",
     border: "none",
@@ -191,11 +218,15 @@ function AppContent() {
         {activeView === "dashboard" && (
           <Dashboard onNavigate={handleNavigate} onOpenImport={() => setImportModalOpen(true)} />
         )}
-        {activeView === "entities" && <EntityBrowser initialCategory={entityFilter} />}
+        {activeView === "entities" && (
+          <EntityBrowser initialCategory={entityFilter} onAddToMapper={handleAddToMapper} />
+        )}
         {activeView === "graph" && activeProject && (
           <MapperView
             projectId={activeProject.id}
             gateway={gateway}
+            entityToAdd={pendingMapperEntity}
+            onEntityAdded={handleEntityAdded}
           />
         )}
       </main>
