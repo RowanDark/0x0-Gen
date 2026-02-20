@@ -1,0 +1,71 @@
+{
+  "matches": [
+    {
+      "ip_str": "93.184.216.34",
+      "port": 443,
+      "org": "Edgecast Inc.",
+      "isp": "Edgecast Inc.",
+      "transport": "tcp",
+      "hostnames": ["www.example-target.com"],
+      "domains": ["example-target.com"],
+      "location": {"city": "Los Angeles", "region_code": "CA", "country_code": "US", "country_name": "United States"},
+      "ssl": {"cert": {"subject": {"CN": "www.example-target.com"}, "issuer": {"CN": "DigiCert TLS RSA SHA256 2020 CA1"}}},
+      "data": "HTTP/1.1 200 OK\r\nServer: nginx/1.21.0\r\n",
+      "product": "nginx",
+      "version": "1.21.0"
+    },
+    {
+      "ip_str": "93.184.216.35",
+      "port": 443,
+      "org": "Edgecast Inc.",
+      "isp": "Edgecast Inc.",
+      "transport": "tcp",
+      "hostnames": ["api.example-target.com"],
+      "domains": ["example-target.com"],
+      "location": {"city": "Los Angeles", "region_code": "CA", "country_code": "US", "country_name": "United States"},
+      "ssl": {"cert": {"subject": {"CN": "api.example-target.com"}, "issuer": {"CN": "DigiCert TLS RSA SHA256 2020 CA1"}}},
+      "data": "HTTP/1.1 200 OK\r\nServer: nginx/1.21.0\r\nX-Powered-By: Express\r\n",
+      "product": "nginx",
+      "version": "1.21.0"
+    },
+    {
+      "ip_str": "93.184.216.36",
+      "port": 25,
+      "org": "Edgecast Inc.",
+      "isp": "Edgecast Inc.",
+      "transport": "tcp",
+      "hostnames": ["mail.example-target.com"],
+      "domains": ["example-target.com"],
+      "location": {"city": "Los Angeles", "region_code": "CA", "country_code": "US", "country_name": "United States"},
+      "data": "220 mail.example-target.com ESMTP Postfix\r\n",
+      "product": "Postfix"
+    },
+    {
+      "ip_str": "104.18.32.68",
+      "port": 443,
+      "org": "Cloudflare, Inc.",
+      "isp": "Cloudflare, Inc.",
+      "transport": "tcp",
+      "hostnames": ["cdn.example-target.com"],
+      "domains": ["example-target.com"],
+      "location": {"city": "San Francisco", "region_code": "CA", "country_code": "US", "country_name": "United States"},
+      "ssl": {"cert": {"subject": {"CN": "*.example-target.com"}, "issuer": {"CN": "Cloudflare Inc ECC CA-3"}}},
+      "data": "HTTP/1.1 403 Forbidden\r\nServer: cloudflare\r\n",
+      "product": "cloudflare"
+    },
+    {
+      "ip_str": "185.199.108.153",
+      "port": 443,
+      "org": "GitHub, Inc.",
+      "isp": "GitHub, Inc.",
+      "transport": "tcp",
+      "hostnames": ["docs.example-target.com"],
+      "domains": ["example-target.com"],
+      "location": {"city": "San Francisco", "region_code": "CA", "country_code": "US", "country_name": "United States"},
+      "ssl": {"cert": {"subject": {"CN": "*.github.io"}, "issuer": {"CN": "DigiCert TLS Hybrid ECC SHA384 2020 CA1"}}},
+      "data": "HTTP/1.1 200 OK\r\nServer: GitHub.com\r\n",
+      "product": "GitHub Pages"
+    }
+  ],
+  "total": 5
+}
