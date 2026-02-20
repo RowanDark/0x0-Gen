@@ -27,8 +27,8 @@ export function EntityPalette({ gateway, projectId, onAddEntities }: EntityPalet
       });
       setEntities(result.entities);
       setTotal(result.total);
-    } catch {
-      // fail silently
+    } catch (error) {
+      console.error("[EntityPalette] Failed to load entities:", error);
     } finally {
       setLoading(false);
     }

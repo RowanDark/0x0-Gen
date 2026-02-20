@@ -6,6 +6,7 @@ export function useEdges(
   gateway: GatewayClient,
   activeCanvas: MapperCanvas | null,
   setActiveCanvas: (updater: (prev: MapperCanvas | null) => MapperCanvas | null) => void,
+  onError?: (message: string) => void,
 ) {
   const addEdge = useCallback(async (
     fromNodeId: string,
@@ -25,10 +26,12 @@ export function useEdges(
         prev ? { ...prev, edges: [...prev.edges, edge] } : null,
       );
       return edge;
-    } catch {
+    } catch (error) {
+      console.error("[useEdges] Failed to add edge:", error);
+      onError?.("Failed to create connection");
       return null;
     }
-  }, [gateway, activeCanvas, setActiveCanvas]);
+  }, [gateway, activeCanvas, setActiveCanvas, onError]);
 
   const deleteEdge = useCallback(async (edgeId: string) => {
     if (!activeCanvas) return;
@@ -39,10 +42,11 @@ export function useEdges(
           ? { ...prev, edges: prev.edges.filter((e) => e.id !== edgeId) }
           : null,
       );
-    } catch {
-      // fail silently
+    } catch (error) {
+      console.error("[useEdges] Failed to delete edge:", error);
+      onError?.("Failed to remove connection");
     }
-  }, [gateway, activeCanvas, setActiveCanvas]);
+  }, [gateway, activeCanvas, setActiveCanvas, onError]);
 
   return {
     addEdge,
