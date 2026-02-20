@@ -6,9 +6,10 @@ export interface BulkActionsProps {
   selectedIds: Set<string>;
   onClearSelection: () => void;
   onRefresh: () => void;
+  addToast?: (message: string, type: "info" | "success" | "error") => void;
 }
 
-export function BulkActions({ selectedCount, selectedIds, onClearSelection, onRefresh }: BulkActionsProps) {
+export function BulkActions({ selectedCount, selectedIds, onClearSelection, onRefresh, addToast }: BulkActionsProps) {
   const { activeProject, gateway } = useReconProject();
   const [showTagInput, setShowTagInput] = useState(false);
   const [tagInput, setTagInput] = useState("");
@@ -22,30 +23,34 @@ export function BulkActions({ selectedCount, selectedIds, onClearSelection, onRe
     setBusy(true);
     try {
       await gateway.bulkTagEntities(activeProject.id, ids, tagInput.trim());
+      addToast?.(`Added tag "${tagInput}" to ${ids.length} entities`, "success");
       setTagInput("");
       setShowTagInput(false);
       onRefresh();
-    } catch {
-      // error handling could be added here
+    } catch (error) {
+      console.error("[BulkActions] Failed to add tag:", error);
+      addToast?.("Failed to add tag", "error");
     } finally {
       setBusy(false);
     }
-  }, [activeProject, gateway, ids, tagInput, onRefresh]);
+  }, [activeProject, gateway, ids, tagInput, onRefresh, addToast]);
 
   const handleDelete = useCallback(async () => {
     if (!activeProject) return;
     setBusy(true);
     try {
       await gateway.bulkDeleteEntities(activeProject.id, ids);
+      addToast?.(`Deleted ${ids.length} entities`, "success");
       setShowDeleteConfirm(false);
       onClearSelection();
       onRefresh();
-    } catch {
-      // error handling
+    } catch (error) {
+      console.error("[BulkActions] Failed to delete entities:", error);
+      addToast?.("Failed to delete entities", "error");
     } finally {
       setBusy(false);
     }
-  }, [activeProject, gateway, ids, onClearSelection, onRefresh]);
+  }, [activeProject, gateway, ids, onClearSelection, onRefresh, addToast]);
 
   const handleExport = useCallback(async (format: "json" | "csv") => {
     if (!activeProject) return;
@@ -59,12 +64,14 @@ export function BulkActions({ selectedCount, selectedIds, onClearSelection, onRe
       a.download = `entities-export.${format}`;
       a.click();
       URL.revokeObjectURL(url);
-    } catch {
-      // error handling
+      addToast?.(`Exported ${ids.length} entities as ${format.toUpperCase()}`, "success");
+    } catch (error) {
+      console.error("[BulkActions] Failed to export entities:", error);
+      addToast?.(`Failed to export as ${format.toUpperCase()}`, "error");
     } finally {
       setBusy(false);
     }
-  }, [activeProject, gateway, ids]);
+  }, [activeProject, gateway, ids, addToast]);
 
   const btnStyle: React.CSSProperties = {
     background: "#1a1a1a",

@@ -51,8 +51,8 @@ export function useImport() {
           const preview = await file.slice(0, 4096).text();
           const detection = await gateway.detectReconFormat(preview, file.name);
           detectedSource = detection.source;
-        } catch {
-          // auto-detection failed, user will pick manually
+        } catch (error) {
+          console.error("[useImport] Auto-detection failed:", error);
         }
         validFiles.push({ file, name: file.name, size: file.size, detectedSource });
       }
@@ -74,8 +74,8 @@ export function useImport() {
       try {
         const detection = await gateway.detectReconFormat(content.slice(0, 4096));
         setAutoDetectedSource(detection.source);
-      } catch {
-        // ignore
+      } catch (error) {
+        console.error("[useImport] Paste format detection failed:", error);
       }
     },
     [gateway],
@@ -104,6 +104,7 @@ export function useImport() {
       setResult(lastImport);
       setFiles([]);
     } catch (err) {
+      console.error("[useImport] File import failed:", err);
       setError(err instanceof Error ? err.message : "Import failed");
       setProgress((prev) => ({ ...prev, active: false }));
     }
@@ -127,6 +128,7 @@ export function useImport() {
       setResult(imported);
       setPasteContent("");
     } catch (err) {
+      console.error("[useImport] Text import failed:", err);
       setError(err instanceof Error ? err.message : "Import failed");
       setProgress((prev) => ({ ...prev, active: false }));
     }
@@ -138,6 +140,7 @@ export function useImport() {
       const list = await gateway.listReconImports(activeProject.id);
       setImports(list);
     } catch (err) {
+      console.error("[useImport] Failed to load imports:", err);
       setError(err instanceof Error ? err.message : "Failed to load imports");
     }
   }, [activeProject, gateway]);

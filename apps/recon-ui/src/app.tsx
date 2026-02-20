@@ -219,7 +219,7 @@ function AppContent() {
           <Dashboard onNavigate={handleNavigate} onOpenImport={() => setImportModalOpen(true)} />
         )}
         {activeView === "entities" && (
-          <EntityBrowser initialCategory={entityFilter} onAddToMapper={handleAddToMapper} />
+          <EntityBrowser initialCategory={entityFilter} onAddToMapper={handleAddToMapper} addToast={addToast} />
         )}
         {activeView === "graph" && activeProject && (
           <MapperView

@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback, useRef } from "react";
 import { GatewayClient } from "@0x0-gen/sdk";
 import type { MapperNode } from "@0x0-gen/sdk";
+import { NotificationToast } from "@0x0-gen/ui";
 import { useCanvas } from "./hooks/useCanvas.js";
 import { useNodes } from "./hooks/useNodes.js";
 import { useEdges } from "./hooks/useEdges.js";
@@ -25,6 +26,12 @@ function getProjectId(): string | null {
   return params.get("projectId");
 }
 
+interface ToastItem {
+  id: string;
+  message: string;
+  type: "info" | "success" | "error";
+}
+
 export function App() {
   const [projectId, setProjectId] = useState<string | null>(getProjectId);
   const [connected, setConnected] = useState(false);
@@ -34,8 +41,29 @@ export function App() {
     nodeId: string;
     position: { x: number; y: number };
   } | null>(null);
+  const [toasts, setToasts] = useState<ToastItem[]>([]);
 
   const containerRef = useRef<HTMLDivElement>(null);
+
+  const addToast = useCallback((message: string, type: "info" | "success" | "error" = "info") => {
+    const id = crypto.randomUUID();
+    setToasts((prev) => [...prev, { id, message, type }]);
+    setTimeout(() => {
+      setToasts((prev) => prev.filter((t) => t.id !== id));
+    }, 4000);
+  }, []);
+
+  const dismissToast = useCallback((id: string) => {
+    setToasts((prev) => prev.filter((t) => t.id !== id));
+  }, []);
+
+  const handleError = useCallback((message: string) => {
+    addToast(message, "error");
+  }, [addToast]);
+
+  const handleSuccess = useCallback((message: string) => {
+    addToast(message, "success");
+  }, [addToast]);
 
   // Health check
   useEffect(() => {
@@ -67,7 +95,7 @@ export function App() {
     deleteCanvas,
     saveViewport,
     autoLayout,
-  } = useCanvas(gateway, projectId);
+  } = useCanvas(gateway, projectId, handleError);
 
   const setActiveCanvasUpdater = useCallback(
     (updater: (prev: any) => any) => setActiveCanvas(updater as any),
@@ -84,14 +112,17 @@ export function App() {
     gateway,
     activeCanvas,
     setActiveCanvasUpdater,
+    handleError,
   );
 
-  const { addEdge, deleteEdge } = useEdges(gateway, activeCanvas, setActiveCanvasUpdater);
+  const { addEdge, deleteEdge } = useEdges(gateway, activeCanvas, setActiveCanvasUpdater, handleError);
 
   const { transforms, running, runTransform, getTransformsForType } = useTransforms(
     gateway,
     activeCanvas,
     setActiveCanvasUpdater,
+    handleError,
+    handleSuccess,
   );
 
   // Update viewport on changes and save
@@ -411,6 +442,12 @@ export function App() {
           {error}
         </div>
       )}
+
+      {/* Toast notifications */}
+      <NotificationToast
+        toasts={toasts.map((t) => ({ id: t.id, message: t.message, type: t.type }))}
+        onDismiss={dismissToast}
+      />
     </div>
   );
 }

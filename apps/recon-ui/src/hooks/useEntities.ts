@@ -55,6 +55,7 @@ export function useEntities() {
         setEntities(result.entities);
         setTotal(result.total);
       } catch (err) {
+        console.error("[useEntities] Failed to load entities:", err);
         setError(err instanceof Error ? err.message : "Failed to load entities");
       } finally {
         setLoading(false);

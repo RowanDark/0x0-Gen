@@ -6,6 +6,7 @@ export function useNodes(
   gateway: GatewayClient,
   activeCanvas: MapperCanvas | null,
   setActiveCanvas: (updater: (prev: MapperCanvas | null) => MapperCanvas | null) => void,
+  onError?: (message: string) => void,
 ) {
   const dragRef = useRef<{ nodeId: string; startX: number; startY: number } | null>(null);
   const saveTimeout = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -26,10 +27,12 @@ export function useNodes(
         prev ? { ...prev, nodes: [...prev.nodes, ...added] } : null,
       );
       return added;
-    } catch {
+    } catch (error) {
+      console.error("[useNodes] Failed to add nodes:", error);
+      onError?.("Failed to add nodes to canvas");
       return [];
     }
-  }, [gateway, activeCanvas, setActiveCanvas]);
+  }, [gateway, activeCanvas, setActiveCanvas, onError]);
 
   const addFromEntities = useCallback(async (entityIds: string[]) => {
     if (!activeCanvas) return;
@@ -47,10 +50,11 @@ export function useNodes(
             }
           : null,
       );
-    } catch {
-      // fail silently
+    } catch (error) {
+      console.error("[useNodes] Failed to add nodes from entities:", error);
+      onError?.("Failed to add entities to canvas");
     }
-  }, [gateway, activeCanvas, setActiveCanvas]);
+  }, [gateway, activeCanvas, setActiveCanvas, onError]);
 
   const updateNodePosition = useCallback((nodeId: string, x: number, y: number) => {
     setActiveCanvas((prev) => {
@@ -69,8 +73,8 @@ export function useNodes(
       if (!activeCanvas) return;
       try {
         await gateway.updateMapperNode(activeCanvas.id, nodeId, { x, y });
-      } catch {
-        // silent fail
+      } catch (error) {
+        console.error("[useNodes] Failed to save node position:", error);
       }
     }, 500);
   }, [gateway, activeCanvas, setActiveCanvas]);
@@ -90,10 +94,11 @@ export function useNodes(
             }
           : null,
       );
-    } catch {
-      // fail silently
+    } catch (error) {
+      console.error("[useNodes] Failed to update node:", error);
+      onError?.("Failed to update node");
     }
-  }, [gateway, activeCanvas, setActiveCanvas]);
+  }, [gateway, activeCanvas, setActiveCanvas, onError]);
 
   const deleteNode = useCallback(async (nodeId: string) => {
     if (!activeCanvas) return;
@@ -110,10 +115,11 @@ export function useNodes(
             }
           : null,
       );
-    } catch {
-      // fail silently
+    } catch (error) {
+      console.error("[useNodes] Failed to delete node:", error);
+      onError?.("Failed to delete node");
     }
-  }, [gateway, activeCanvas, setActiveCanvas]);
+  }, [gateway, activeCanvas, setActiveCanvas, onError]);
 
   const startDrag = useCallback((nodeId: string, clientX: number, clientY: number) => {
     dragRef.current = { nodeId, startX: clientX, startY: clientY };
@@ -151,7 +157,9 @@ export function useNodes(
     // Save final position
     const node = activeCanvas.nodes.find((n) => n.id === nodeId);
     if (node) {
-      gateway.updateMapperNode(activeCanvas.id, nodeId, { x: node.x, y: node.y }).catch(() => {});
+      gateway.updateMapperNode(activeCanvas.id, nodeId, { x: node.x, y: node.y }).catch((error) => {
+        console.error("[useNodes] Failed to save drag position:", error);
+      });
     }
   }, [gateway, activeCanvas]);
 

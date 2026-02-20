@@ -23,6 +23,7 @@ export function useEntityDetail() {
         const detail = await gateway.getReconEntity(activeProject.id, entityId);
         setEntity(detail);
       } catch (err) {
+        console.error("[useEntityDetail] Failed to load entity:", err);
         setError(err instanceof Error ? err.message : "Failed to load entity");
       } finally {
         setLoading(false);
@@ -38,6 +39,7 @@ export function useEntityDetail() {
         const updated = await gateway.updateReconEntity(activeProject.id, entity.id, { tags });
         setEntity((prev) => (prev ? { ...prev, tags: updated.tags } : null));
       } catch (err) {
+        console.error("[useEntityDetail] Failed to update tags:", err);
         setError(err instanceof Error ? err.message : "Failed to update tags");
       }
     },
@@ -51,6 +53,7 @@ export function useEntityDetail() {
         const updated = await gateway.updateReconEntity(activeProject.id, entity.id, { notes });
         setEntity((prev) => (prev ? { ...prev, notes: updated.notes } : null));
       } catch (err) {
+        console.error("[useEntityDetail] Failed to update notes:", err);
         setError(err instanceof Error ? err.message : "Failed to update notes");
       }
     },
