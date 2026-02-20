@@ -20,6 +20,14 @@ import type {
   ReconRelationship,
   ReconImport,
   ImportSourceType,
+  MapperCanvas,
+  MapperNode,
+  MapperEdge,
+  MapperTransform,
+  MapperTransformResult,
+  MapperViewport,
+  MapperNodeStyle,
+  MapperEdgeStyle,
 } from "@0x0-gen/contracts";
 import { createLogger } from "@0x0-gen/logger";
 
@@ -1088,5 +1096,224 @@ export class GatewayClient {
       source: string | null;
       confidence: number;
     }>;
+  }
+
+  // ========================
+  // Mapper — Canvas methods
+  // ========================
+
+  async createMapperCanvas(
+    projectId: string,
+    name: string,
+  ): Promise<MapperCanvas> {
+    const res = await fetch(`${this.baseUrl}/mapper/canvases`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ projectId, name }),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to create mapper canvas: ${res.status}`);
+    }
+    return res.json() as Promise<MapperCanvas>;
+  }
+
+  async listMapperCanvases(projectId: string): Promise<MapperCanvas[]> {
+    const params = new URLSearchParams({ projectId });
+    const res = await fetch(`${this.baseUrl}/mapper/canvases?${params}`);
+    if (!res.ok) {
+      throw new Error(`Failed to list mapper canvases: ${res.status}`);
+    }
+    const data = (await res.json()) as { canvases: MapperCanvas[] };
+    return data.canvases;
+  }
+
+  async getMapperCanvas(canvasId: string): Promise<MapperCanvas> {
+    const res = await fetch(`${this.baseUrl}/mapper/canvases/${canvasId}`);
+    if (!res.ok) {
+      throw new Error(`Failed to get mapper canvas: ${res.status}`);
+    }
+    return res.json() as Promise<MapperCanvas>;
+  }
+
+  async updateMapperCanvas(
+    canvasId: string,
+    data: { name?: string; viewport?: MapperViewport },
+  ): Promise<MapperCanvas> {
+    const res = await fetch(`${this.baseUrl}/mapper/canvases/${canvasId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to update mapper canvas: ${res.status}`);
+    }
+    return res.json() as Promise<MapperCanvas>;
+  }
+
+  async deleteMapperCanvas(canvasId: string): Promise<void> {
+    const res = await fetch(`${this.baseUrl}/mapper/canvases/${canvasId}`, {
+      method: "DELETE",
+    });
+    if (!res.ok) {
+      throw new Error(`Failed to delete mapper canvas: ${res.status}`);
+    }
+  }
+
+  // ========================
+  // Mapper — Node methods
+  // ========================
+
+  async addMapperNodes(
+    canvasId: string,
+    nodes: Array<{
+      entityId?: string;
+      type: string;
+      label: string;
+      x?: number;
+      y?: number;
+      pinned?: boolean;
+      style?: MapperNodeStyle;
+      data?: Record<string, unknown>;
+    }>,
+  ): Promise<MapperNode[]> {
+    const res = await fetch(
+      `${this.baseUrl}/mapper/canvases/${canvasId}/nodes`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ nodes }),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to add mapper nodes: ${res.status}`);
+    }
+    const data = (await res.json()) as { nodes: MapperNode[] };
+    return data.nodes;
+  }
+
+  async addNodesFromEntities(
+    canvasId: string,
+    entityIds: string[],
+  ): Promise<{ nodes: MapperNode[]; edges: MapperEdge[] }> {
+    const res = await fetch(
+      `${this.baseUrl}/mapper/canvases/${canvasId}/nodes/from-entities`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ entityIds }),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to add nodes from entities: ${res.status}`);
+    }
+    return res.json() as Promise<{ nodes: MapperNode[]; edges: MapperEdge[] }>;
+  }
+
+  async updateMapperNode(
+    canvasId: string,
+    nodeId: string,
+    data: { x?: number; y?: number; pinned?: boolean; label?: string; style?: MapperNodeStyle },
+  ): Promise<MapperNode> {
+    const res = await fetch(
+      `${this.baseUrl}/mapper/canvases/${canvasId}/nodes/${nodeId}`,
+      {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to update mapper node: ${res.status}`);
+    }
+    return res.json() as Promise<MapperNode>;
+  }
+
+  async deleteMapperNode(canvasId: string, nodeId: string): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/mapper/canvases/${canvasId}/nodes/${nodeId}`,
+      { method: "DELETE" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to delete mapper node: ${res.status}`);
+    }
+  }
+
+  // ========================
+  // Mapper — Edge methods
+  // ========================
+
+  async addMapperEdge(
+    canvasId: string,
+    edge: { fromNodeId: string; toNodeId: string; type: string; label?: string; style?: MapperEdgeStyle },
+  ): Promise<MapperEdge> {
+    const res = await fetch(
+      `${this.baseUrl}/mapper/canvases/${canvasId}/edges`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(edge),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to add mapper edge: ${res.status}`);
+    }
+    return res.json() as Promise<MapperEdge>;
+  }
+
+  async deleteMapperEdge(canvasId: string, edgeId: string): Promise<void> {
+    const res = await fetch(
+      `${this.baseUrl}/mapper/canvases/${canvasId}/edges/${edgeId}`,
+      { method: "DELETE" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to delete mapper edge: ${res.status}`);
+    }
+  }
+
+  // ========================
+  // Mapper — Transform methods
+  // ========================
+
+  async listMapperTransforms(): Promise<MapperTransform[]> {
+    const res = await fetch(`${this.baseUrl}/mapper/transforms`);
+    if (!res.ok) {
+      throw new Error(`Failed to list mapper transforms: ${res.status}`);
+    }
+    const data = (await res.json()) as { transforms: MapperTransform[] };
+    return data.transforms;
+  }
+
+  async runTransform(
+    canvasId: string,
+    nodeId: string,
+    transformId: string,
+  ): Promise<MapperTransformResult> {
+    const res = await fetch(
+      `${this.baseUrl}/mapper/canvases/${canvasId}/nodes/${nodeId}/transform`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ transformId }),
+      },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to run transform: ${res.status}`);
+    }
+    return res.json() as Promise<MapperTransformResult>;
+  }
+
+  // ========================
+  // Mapper — Layout
+  // ========================
+
+  async autoLayoutCanvas(canvasId: string): Promise<MapperCanvas> {
+    const res = await fetch(
+      `${this.baseUrl}/mapper/canvases/${canvasId}/layout`,
+      { method: "POST" },
+    );
+    if (!res.ok) {
+      throw new Error(`Failed to auto-layout canvas: ${res.status}`);
+    }
+    return res.json() as Promise<MapperCanvas>;
   }
 }
