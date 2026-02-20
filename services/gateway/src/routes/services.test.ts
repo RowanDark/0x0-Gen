@@ -23,25 +23,81 @@ afterAll(async () => {
   if (tmpDir) fs.rmSync(tmpDir, { recursive: true, force: true });
 });
 
-describe("Gateway /services", () => {
-  it("returns stub service list", async () => {
-    const response = await app.inject({
+describe("Services Status", () => {
+  it("returns status for all services", async () => {
+    const res = await app.inject({
       method: "GET",
       url: "/services",
     });
 
-    expect(response.statusCode).toBe(200);
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.services).toBeInstanceOf(Array);
+    expect(body.services.length).toBeGreaterThan(0);
+    expect(body.services).toHaveLength(6);
 
-    const body = response.json();
-    expect(body.services).toHaveLength(4);
     expect(body.services.map((s: { name: string }) => s.name)).toEqual([
       "proxy",
       "replay",
       "decoder",
       "intruder",
+      "recon",
+      "mapper",
     ]);
+
     for (const service of body.services) {
-      expect(service.status).toBe("stub");
+      expect(service).toHaveProperty("name");
+      expect(service).toHaveProperty("status");
+      expect(["running", "stopped", "error", "unknown"]).toContain(service.status);
     }
+  });
+
+  it("returns in-process services as running", async () => {
+    const res = await app.inject({
+      method: "GET",
+      url: "/services",
+    });
+
+    const body = res.json();
+    const inProcessServices = body.services.filter(
+      (s: { name: string }) => ["replay", "decoder", "intruder", "recon", "mapper"].includes(s.name),
+    );
+
+    for (const service of inProcessServices) {
+      expect(service.status).toBe("running");
+    }
+  });
+
+  it("returns status for individual service", async () => {
+    const res = await app.inject({
+      method: "GET",
+      url: "/services/replay",
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.name).toBe("replay");
+    expect(body.status).toBe("running");
+  });
+
+  it("returns 404 for unknown service", async () => {
+    const res = await app.inject({
+      method: "GET",
+      url: "/services/nonexistent",
+    });
+
+    expect(res.statusCode).toBe(404);
+  });
+
+  it("includes lastCheck timestamp in response", async () => {
+    const res = await app.inject({
+      method: "GET",
+      url: "/services/decoder",
+    });
+
+    expect(res.statusCode).toBe(200);
+    const body = res.json();
+    expect(body.lastCheck).toBeDefined();
+    expect(typeof body.lastCheck).toBe("number");
   });
 });
