@@ -1,0 +1,15 @@
+{"url":"https://www.example-target.com","status_code":200,"title":"Example Target - Home","webserver":"nginx/1.21.0","tech":["Nginx","React","Google Analytics"],"content_length":45678,"content_type":"text/html"}
+{"url":"https://api.example-target.com","status_code":200,"title":"API Documentation","webserver":"nginx/1.21.0","tech":["Nginx","Swagger","Node.js"],"content_length":12345,"content_type":"application/json"}
+{"url":"https://admin.example-target.com","status_code":401,"title":"Admin Login","webserver":"nginx/1.21.0","tech":["Nginx","PHP","Laravel"],"content_length":5678,"content_type":"text/html"}
+{"url":"https://portal.example-target.com","status_code":200,"title":"Customer Portal","webserver":"Apache/2.4.51","tech":["Apache","PHP","WordPress"],"content_length":34567,"content_type":"text/html"}
+{"url":"https://blog.example-target.com","status_code":200,"title":"Example Blog","webserver":"nginx","tech":["Nginx","WordPress","PHP"],"content_length":56789,"content_type":"text/html"}
+{"url":"https://shop.example-target.com","status_code":200,"title":"Example Shop","webserver":"nginx/1.21.0","tech":["Nginx","Shopify","React"],"content_length":67890,"content_type":"text/html"}
+{"url":"https://docs.example-target.com","status_code":200,"title":"Documentation","webserver":"GitHub.com","tech":["GitHub Pages","Jekyll"],"content_length":23456,"content_type":"text/html"}
+{"url":"https://status.example-target.com","status_code":200,"title":"System Status","webserver":"cloudflare","tech":["Cloudflare","Statuspage"],"content_length":8901,"content_type":"text/html"}
+{"url":"https://support.example-target.com","status_code":200,"title":"Support Center","webserver":"nginx","tech":["Nginx","Zendesk"],"content_length":45678,"content_type":"text/html"}
+{"url":"https://cdn.example-target.com","status_code":403,"title":"403 Forbidden","webserver":"cloudflare","tech":["Cloudflare"],"content_length":1234,"content_type":"text/html"}
+{"url":"https://dev.example-target.com","status_code":401,"title":"Development Server","webserver":"nginx/1.21.0","tech":["Nginx","Node.js","Express"],"content_length":2345,"content_type":"text/html"}
+{"url":"https://staging.example-target.com","status_code":200,"title":"Staging Environment","webserver":"nginx/1.21.0","tech":["Nginx","React","Node.js"],"content_length":45678,"content_type":"text/html"}
+{"url":"https://grafana.example-target.com","status_code":200,"title":"Grafana","webserver":"nginx","tech":["Nginx","Grafana"],"content_length":12345,"content_type":"text/html"}
+{"url":"https://jenkins.example-target.com","status_code":200,"title":"Jenkins","webserver":"Jetty","tech":["Jenkins","Java"],"content_length":23456,"content_type":"text/html"}
+{"url":"https://gitlab.example-target.com","status_code":200,"title":"GitLab","webserver":"nginx","tech":["Nginx","GitLab","Ruby"],"content_length":34567,"content_type":"text/html"}
