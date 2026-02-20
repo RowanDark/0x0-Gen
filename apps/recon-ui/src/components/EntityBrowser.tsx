@@ -10,9 +10,10 @@ import type { EntityCategory } from "@0x0-gen/sdk";
 export interface EntityBrowserProps {
   initialCategory?: string;
   onAddToMapper?: (entityId: string) => void;
+  addToast?: (message: string, type: "info" | "success" | "error") => void;
 }
 
-export function EntityBrowser({ initialCategory, onAddToMapper }: EntityBrowserProps) {
+export function EntityBrowser({ initialCategory, onAddToMapper, addToast }: EntityBrowserProps) {
   const searchRef = useRef<HTMLInputElement>(null) as React.RefObject<HTMLInputElement>;
   const {
     entities,
@@ -75,6 +76,7 @@ export function EntityBrowser({ initialCategory, onAddToMapper }: EntityBrowserP
             selectedIds={selectedIds}
             onClearSelection={clearSelection}
             onRefresh={refresh}
+            addToast={addToast}
           />
         )}
 
