@@ -1,5 +1,5 @@
-import React, { useEffect, useCallback, useState } from "react";
-import type { RepeaterHistoryEntry } from "@0x0-gen/sdk";
+import React, { useEffect, useCallback, useState, useRef } from "react";
+import type { RepeaterHistoryEntry, RepeaterRequest } from "@0x0-gen/sdk";
 import { useRepeater } from "./hooks/useRepeater.js";
 import { TabBar } from "./components/TabBar.js";
 import { RequestEditor } from "./components/RequestEditor.js";
@@ -28,6 +28,37 @@ export function App() {
   } = useRepeater();
 
   const [viewedEntry, setViewedEntry] = useState<RepeaterHistoryEntry | null>(null);
+  const urlParamHandled = useRef(false);
+
+  // Handle URL query parameter (e.g., ?url=https://example.com)
+  useEffect(() => {
+    if (urlParamHandled.current) return;
+    const params = new URLSearchParams(window.location.search);
+    const urlParam = params.get("url");
+    if (!urlParam) return;
+    urlParamHandled.current = true;
+
+    // Clear the URL param to avoid re-creating on refresh
+    window.history.replaceState({}, "", window.location.pathname);
+
+    void (async () => {
+      const tab = await createTab();
+      if (!tab) return;
+      try {
+        const parsed = new URL(urlParam);
+        const request: RepeaterRequest = {
+          method: "GET",
+          url: urlParam,
+          headers: { Host: parsed.host },
+          body: null,
+        };
+        await updateRequest(request);
+      } catch {
+        // If URL is invalid, just set it as-is
+        await updateRequest({ method: "GET", url: urlParam, headers: {}, body: null });
+      }
+    })();
+  }, [createTab, updateRequest]);
 
   // When a new entry arrives, auto-show it
   useEffect(() => {

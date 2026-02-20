@@ -4,16 +4,19 @@ import type { EventMessage } from "@0x0-gen/sdk";
 import type { ConnectionState } from "@0x0-gen/ui";
 import { NotificationToast } from "@0x0-gen/ui";
 import {
+  useReconProject,
   useReconProjectProvider,
   ProjectContextProvider,
 } from "./hooks/useReconProject.js";
+import { MapperView } from "@0x0-gen/mapper-components";
+import type { EntityToAdd } from "@0x0-gen/mapper-components";
 import { Dashboard } from "./components/Dashboard.js";
 import { EntityBrowser } from "./components/EntityBrowser.js";
 import { ImportModal } from "./components/ImportModal.js";
 
 const gateway = new GatewayClient({ baseUrl: window.location.origin });
 
-type View = "dashboard" | "entities" | "imports";
+type View = "dashboard" | "entities" | "imports" | "graph";
 
 interface Toast {
   id: string;
@@ -22,11 +25,13 @@ interface Toast {
 }
 
 function AppContent() {
+  const { activeProject, gateway } = useReconProject();
   const [connectionState, setConnectionState] = useState<ConnectionState>("connecting");
   const [activeView, setActiveView] = useState<View>("dashboard");
   const [importModalOpen, setImportModalOpen] = useState(false);
   const [entityFilter, setEntityFilter] = useState<string | undefined>();
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [pendingMapperEntity, setPendingMapperEntity] = useState<EntityToAdd | null>(null);
 
   // Health check
   useEffect(() => {
@@ -98,8 +103,7 @@ function AppContent() {
       setEntityFilter(filter);
       setActiveView("entities");
     } else if (view === "graph") {
-      // Graph view not yet implemented, go to entities
-      setActiveView("entities");
+      setActiveView("graph");
     } else {
       setActiveView(view as View);
     }
@@ -108,6 +112,31 @@ function AppContent() {
   const handleImportComplete = useCallback(() => {
     addToast("Import completed successfully", "success");
   }, [addToast]);
+
+  const handleAddToMapper = useCallback(
+    async (entityId: string) => {
+      if (!activeProject) return;
+      try {
+        const entity = await gateway.getReconEntity(activeProject.id, entityId);
+        setPendingMapperEntity({
+          id: entity.id,
+          label: entity.value,
+          type: entity.type,
+          category: entity.category,
+          confidence: entity.confidence,
+        });
+        setActiveView("graph");
+        addToast("Entity added to graph", "success");
+      } catch {
+        addToast("Failed to add entity to graph", "error");
+      }
+    },
+    [activeProject, gateway, addToast],
+  );
+
+  const handleEntityAdded = useCallback(() => {
+    setPendingMapperEntity(null);
+  }, []);
 
   const navBtnStyle = (active: boolean): React.CSSProperties => ({
     background: active ? "#1a1a1a" : "transparent",
@@ -158,6 +187,9 @@ function AppContent() {
             <button style={navBtnStyle(activeView === "imports")} onClick={() => setImportModalOpen(true)}>
               Import
             </button>
+            <button style={navBtnStyle(activeView === "graph")} onClick={() => setActiveView("graph")}>
+              Graph
+            </button>
           </nav>
         </div>
 
@@ -186,7 +218,17 @@ function AppContent() {
         {activeView === "dashboard" && (
           <Dashboard onNavigate={handleNavigate} onOpenImport={() => setImportModalOpen(true)} />
         )}
-        {activeView === "entities" && <EntityBrowser initialCategory={entityFilter} />}
+        {activeView === "entities" && (
+          <EntityBrowser initialCategory={entityFilter} onAddToMapper={handleAddToMapper} />
+        )}
+        {activeView === "graph" && activeProject && (
+          <MapperView
+            projectId={activeProject.id}
+            gateway={gateway}
+            entityToAdd={pendingMapperEntity}
+            onEntityAdded={handleEntityAdded}
+          />
+        )}
       </main>
 
       {/* Import modal */}

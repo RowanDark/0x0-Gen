@@ -238,6 +238,9 @@ importers:
 
   apps/recon-ui:
     dependencies:
+      '@0x0-gen/mapper-components':
+        specifier: workspace:*
+        version: link:../../packages/mapper-components
       '@0x0-gen/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
@@ -351,6 +354,25 @@ importers:
       '@types/node':
         specifier: ^22.0.0
         version: 22.19.11
+      typescript:
+        specifier: ^5.6.0
+        version: 5.9.3
+
+  packages/mapper-components:
+    dependencies:
+      '@0x0-gen/sdk':
+        specifier: workspace:*
+        version: link:../sdk
+      react:
+        specifier: ^18.3.0
+        version: 18.3.1
+    devDependencies:
+      '@0x0-gen/config':
+        specifier: workspace:*
+        version: link:../config
+      '@types/react':
+        specifier: ^18.3.0
+        version: 18.3.28
       typescript:
         specifier: ^5.6.0
         version: 5.9.3

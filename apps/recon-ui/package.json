@@ -10,6 +10,7 @@
     "test": "vitest run"
   },
   "dependencies": {
+    "@0x0-gen/mapper-components": "workspace:*",
     "@0x0-gen/sdk": "workspace:*",
     "@0x0-gen/ui": "workspace:*",
     "react": "^18.3.0",
