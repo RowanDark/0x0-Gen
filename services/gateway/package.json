@@ -13,17 +13,18 @@
   },
   "dependencies": {
     "@0x0-gen/contracts": "workspace:*",
-    "@0x0-gen/logger": "workspace:*",
     "@0x0-gen/decoder": "workspace:*",
     "@0x0-gen/intruder": "workspace:*",
+    "@0x0-gen/logger": "workspace:*",
     "@0x0-gen/proxy": "workspace:*",
     "@0x0-gen/recon": "workspace:*",
     "@0x0-gen/replay": "workspace:*",
-    "@fastify/multipart": "^9.0.0",
     "@fastify/cors": "^10.0.0",
+    "@fastify/multipart": "^9.0.0",
     "@fastify/websocket": "^11.0.0",
     "better-sqlite3": "^12.6.2",
-    "fastify": "^5.1.0"
+    "fastify": "^5.1.0",
+    "whois": "^2.16.1"
   },
   "devDependencies": {
     "@0x0-gen/config": "workspace:*",
