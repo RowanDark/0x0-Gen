@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE nmaprun>
+<nmaprun scanner="nmap" args="nmap -sV -sC -oX nmap-example.xml example-target.com" start="1705312200" version="7.94">
+<host starttime="1705312200" endtime="1705312250">
+  <status state="up" reason="echo-reply"/>
+  <address addr="93.184.216.34" addrtype="ipv4"/>
+  <hostnames>
+    <hostname name="www.example-target.com" type="user"/>
+  </hostnames>
+  <ports>
+    <port protocol="tcp" portid="22">
+      <state state="filtered" reason="no-response"/>
+      <service name="ssh" product="OpenSSH" version="8.9p1"/>
+    </port>
+    <port protocol="tcp" portid="80">
+      <state state="open" reason="syn-ack"/>
+      <service name="http" product="nginx" version="1.21.0"/>
+    </port>
+    <port protocol="tcp" portid="443">
+      <state state="open" reason="syn-ack"/>
+      <service name="https" product="nginx" version="1.21.0" tunnel="ssl"/>
+    </port>
+  </ports>
+</host>
+<host starttime="1705312251" endtime="1705312300">
+  <status state="up" reason="echo-reply"/>
+  <address addr="93.184.216.35" addrtype="ipv4"/>
+  <hostnames>
+    <hostname name="api.example-target.com" type="user"/>
+  </hostnames>
+  <ports>
+    <port protocol="tcp" portid="80">
+      <state state="open" reason="syn-ack"/>
+      <service name="http" product="nginx" version="1.21.0"/>
+    </port>
+    <port protocol="tcp" portid="443">
+      <state state="open" reason="syn-ack"/>
+      <service name="https" product="nginx" version="1.21.0" tunnel="ssl"/>
+    </port>
+    <port protocol="tcp" portid="8080">
+      <state state="open" reason="syn-ack"/>
+      <service name="http-proxy" product="nginx"/>
+    </port>
+  </ports>
+</host>
+<host starttime="1705312301" endtime="1705312350">
+  <status state="up" reason="echo-reply"/>
+  <address addr="93.184.216.36" addrtype="ipv4"/>
+  <hostnames>
+    <hostname name="mail.example-target.com" type="user"/>
+  </hostnames>
+  <ports>
+    <port protocol="tcp" portid="25">
+      <state state="open" reason="syn-ack"/>
+      <service name="smtp" product="Postfix"/>
+    </port>
+    <port protocol="tcp" portid="110">
+      <state state="open" reason="syn-ack"/>
+      <service name="pop3" product="Dovecot"/>
+    </port>
+    <port protocol="tcp" portid="143">
+      <state state="open" reason="syn-ack"/>
+      <service name="imap" product="Dovecot"/>
+    </port>
+    <port protocol="tcp" portid="465">
+      <state state="open" reason="syn-ack"/>
+      <service name="smtps" product="Postfix" tunnel="ssl"/>
+    </port>
+    <port protocol="tcp" portid="587">
+      <state state="open" reason="syn-ack"/>
+      <service name="submission" product="Postfix"/>
+    </port>
+    <port protocol="tcp" portid="993">
+      <state state="open" reason="syn-ack"/>
+      <service name="imaps" product="Dovecot" tunnel="ssl"/>
+    </port>
+    <port protocol="tcp" portid="995">
+      <state state="open" reason="syn-ack"/>
+      <service name="pop3s" product="Dovecot" tunnel="ssl"/>
+    </port>
+  </ports>
+</host>
+<host starttime="1705312351" endtime="1705312400">
+  <status state="up" reason="echo-reply"/>
+  <address addr="10.0.2.50" addrtype="ipv4"/>
+  <hostnames>
+    <hostname name="jenkins.example-target.com" type="user"/>
+  </hostnames>
+  <ports>
+    <port protocol="tcp" portid="8080">
+      <state state="open" reason="syn-ack"/>
+      <service name="http" product="Jetty" extrainfo="Jenkins"/>
+    </port>
+    <port protocol="tcp" portid="50000">
+      <state state="open" reason="syn-ack"/>
+      <service name="jenkins-agent"/>
+    </port>
+  </ports>
+</host>
+<host starttime="1705312401" endtime="1705312450">
+  <status state="up" reason="echo-reply"/>
+  <address addr="10.0.2.51" addrtype="ipv4"/>
+  <hostnames>
+    <hostname name="gitlab.example-target.com" type="user"/>
+  </hostnames>
+  <ports>
+    <port protocol="tcp" portid="22">
+      <state state="open" reason="syn-ack"/>
+      <service name="ssh" product="OpenSSH" version="8.9p1" extrainfo="GitLab"/>
+    </port>
+    <port protocol="tcp" portid="80">
+      <state state="open" reason="syn-ack"/>
+      <service name="http" product="nginx"/>
+    </port>
+    <port protocol="tcp" portid="443">
+      <state state="open" reason="syn-ack"/>
+      <service name="https" product="nginx" tunnel="ssl"/>
+    </port>
+  </ports>
+</host>
+<runstats>
+  <finished time="1705312450" elapsed="250"/>
+  <hosts up="5" down="0" total="5"/>
+</runstats>
+</nmaprun>
