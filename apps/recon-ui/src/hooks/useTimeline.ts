@@ -24,6 +24,7 @@ export function useTimeline() {
       const data = await gateway.getReconTimeline(activeProject.id);
       setTimeline(data);
     } catch (err) {
+      console.error("[useTimeline] Failed to load timeline:", err);
       setError(err instanceof Error ? err.message : "Failed to load timeline");
     } finally {
       setLoading(false);

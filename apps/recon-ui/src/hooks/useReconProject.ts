@@ -42,6 +42,7 @@ export function useReconProjectProvider(): ReconProjectContext {
         setActiveProject(list[0]);
       }
     } catch (err) {
+      console.error("[useReconProject] Failed to load projects:", err);
       setError(err instanceof Error ? err.message : "Failed to load projects");
     } finally {
       setLoading(false);

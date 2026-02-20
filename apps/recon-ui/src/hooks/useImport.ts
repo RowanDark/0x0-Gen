@@ -140,6 +140,7 @@ export function useImport() {
       const list = await gateway.listReconImports(activeProject.id);
       setImports(list);
     } catch (err) {
+      console.error("[useImport] Failed to load imports:", err);
       setError(err instanceof Error ? err.message : "Failed to load imports");
     }
   }, [activeProject, gateway]);

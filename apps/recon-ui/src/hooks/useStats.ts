@@ -40,6 +40,7 @@ export function useStats() {
         recentImportCount: (raw.recentImportCount as number) ?? 0,
       });
     } catch (err) {
+      console.error("[useStats] Failed to load stats:", err);
       setError(err instanceof Error ? err.message : "Failed to load stats");
     } finally {
       setLoading(false);
