@@ -8,6 +8,8 @@
     "format": "prettier --write \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,js,jsx,json,md}\"",
     "test": "turbo run test",
+    "test:integration": "./scripts/test-integration.sh",
+    "test:samples": "./scripts/test-integration-with-samples.sh",
     "desktop": "turbo run dev --filter=desktop"
   },
   "devDependencies": {
