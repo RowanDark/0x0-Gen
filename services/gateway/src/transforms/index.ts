@@ -1,16 +1,45 @@
 import type { Transform } from "./base.js";
+import type { MapperTransform } from "@0x0-gen/contracts";
+import { relatedEntitiesTransform } from "./related-entities.js";
+import { dnsLookupTransform } from "./dns-lookup.js";
+import { reverseDnsTransform } from "./reverse-dns.js";
+import { subdomainEnumTransform } from "./subdomain-enum.js";
+import { urlExtractTransform } from "./url-extract.js";
+import { techDetectTransform } from "./tech-detect.js";
+import { portLookupTransform } from "./port-lookup.js";
 import { whoisTransform } from "./whois.js";
+import { certSearchTransform } from "./cert-search.js";
 
-export type { Transform, TransformInput, TransformResult } from "./base.js";
+const transforms: Transform[] = [
+  relatedEntitiesTransform,
+  dnsLookupTransform,
+  reverseDnsTransform,
+  subdomainEnumTransform,
+  urlExtractTransform,
+  techDetectTransform,
+  portLookupTransform,
+  whoisTransform,
+  certSearchTransform,
+];
 
-const transforms: Transform[] = [whoisTransform];
-
-export function getTransformById(id: string): Transform | undefined {
-  return transforms.find((t) => t.id === id);
+const transformMap = new Map<string, Transform>();
+for (const t of transforms) {
+  transformMap.set(t.id, t);
 }
 
-export function listTransforms(): Transform[] {
-  return transforms;
+export function listTransforms(): MapperTransform[] {
+  return transforms.map((t) => ({
+    id: t.id,
+    name: t.name,
+    description: t.description,
+    inputTypes: t.inputTypes,
+    outputTypes: t.outputTypes,
+    requiresApi: t.requiresApi,
+  }));
 }
 
-export { whoisTransform };
+export function getTransform(id: string): Transform | undefined {
+  return transformMap.get(id);
+}
+
+export type { Transform, TransformResult } from "./base.js";

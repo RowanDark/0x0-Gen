@@ -1,33 +1,33 @@
+import type { EntityType, MapperNode, MapperEdge } from "@0x0-gen/contracts";
+
 export interface TransformInput {
   id: string;
+  type: EntityType;
   value: string;
-  type: string;
-}
-
-export interface TransformNode {
-  entityId: string | null;
-  type: string;
-  label: string;
-}
-
-export interface TransformEdge {
-  fromNodeId: string;
-  toNodeId: string;
-  type: string;
-  label: string;
+  projectId: string;
+  [key: string]: unknown;
 }
 
 export interface TransformResult {
-  nodes: TransformNode[];
-  edges: TransformEdge[];
+  nodes: Array<{
+    entityId: string | null;
+    type: EntityType;
+    label: string;
+  }>;
+  edges: Array<{
+    fromNodeId: string;
+    toNodeId: string;
+    type: string;
+    label?: string;
+  }>;
 }
 
 export interface Transform {
   id: string;
   name: string;
   description: string;
-  inputTypes: string[];
-  outputTypes: string[];
+  inputTypes: EntityType[];
+  outputTypes: EntityType[];
   requiresApi: boolean;
   execute(entity: TransformInput, projectId: string): Promise<TransformResult>;
 }

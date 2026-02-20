@@ -13,6 +13,7 @@ import { repeaterRoutes } from "./routes/repeater.js";
 import { decoderRoutes } from "./routes/decoder.js";
 import { intruderRoutes } from "./routes/intruder.js";
 import { reconRoutes } from "./routes/recon.js";
+import { mapperRoutes } from "./routes/mapper.js";
 import multipart from "@fastify/multipart";
 
 const logger = createLogger("gateway");
@@ -35,6 +36,7 @@ export async function buildApp() {
   await app.register(decoderRoutes);
   await app.register(intruderRoutes);
   await app.register(reconRoutes);
+  await app.register(mapperRoutes);
 
   logger.info("Gateway app built");
 

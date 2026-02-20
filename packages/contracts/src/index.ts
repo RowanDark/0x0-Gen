@@ -91,3 +91,21 @@ export {
   type ReconImportError,
   type ReconImport,
 } from "./schemas/recon.js";
+export {
+  MapperNodeStyleSchema,
+  MapperEdgeStyleSchema,
+  MapperViewportSchema,
+  MapperNodeSchema,
+  MapperEdgeSchema,
+  MapperCanvasSchema,
+  MapperTransformSchema,
+  MapperTransformResultSchema,
+  type MapperNodeStyle,
+  type MapperEdgeStyle,
+  type MapperViewport,
+  type MapperNode,
+  type MapperEdge,
+  type MapperCanvas,
+  type MapperTransform,
+  type MapperTransformResult,
+} from "./schemas/mapper.js";
